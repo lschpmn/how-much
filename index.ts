@@ -1,7 +1,8 @@
 import getIncrementalPort from 'get-incremental-port';
-import nodemon from 'nodemon';
 import { join } from 'path';
 import process from 'process';
+// nodemon needs to be "required" because it's special
+const nodemon = require('nodemon');
 
 const PORT = process.argv.includes('--port') ? process.argv[process.argv.indexOf('--port') + 1] : 5001;
 
@@ -11,7 +12,6 @@ const PORT = process.argv.includes('--port') ? process.argv[process.argv.indexOf
   nodemon({
     watch: [join(__dirname, 'server')],
     script: join(__dirname, 'server/index.ts'),
-    // @ts-ignore It is args, bad type maintainer
     args: [
       '--port', port.toString(),
       '--development',

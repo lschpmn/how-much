@@ -1,16 +1,15 @@
 import { styled } from '@mui/material';
 import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import AddButton from './components/AddButton';
+import ListContainer from './components/ListContainer';
 
 const App = () => {
 
   return (
     <Container>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<div>Hello world</div>}/>
-        </Routes>
-      </BrowserRouter>
+      <AddButton/>
+
+      <ListContainer/>
     </Container>
   );
 };
