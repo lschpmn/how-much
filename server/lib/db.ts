@@ -1,7 +1,7 @@
 import { exists, read, writeAsync } from 'fs-jetpack';
-import { throttle } from 'lodash';
+import { cloneDeep, throttle } from 'lodash';
 import { join } from 'path';
-import { DbSchema } from '../../types';
+import { DbSchema, Dosage } from '../../types';
 
 const DB_PATH = join(__dirname, '../..', 'bin', 'db.json');
 
@@ -12,10 +12,22 @@ class DB {
     if (exists(DB_PATH)) {
       this.data = read(DB_PATH, 'json');
     } else {
-      this.data = {};
+      this.data = {
+        dosages: [],
+      };
 
       this.save();
     }
+  }
+
+  addDosage(dosage: Dosage) {
+    this.data.dosages.push(dosage);
+    this.data.dosages.sort((a, b) => b.timestamp - a.timestamp);
+    this.save();
+  }
+
+  getDosages(): Dosage[] {
+    return cloneDeep(this.data.dosages);
   }
 
   private save = throttle(() => {

@@ -1,14 +1,28 @@
 import { Button, Modal, Paper, TextField, Typography } from '@mui/material';
 import React, { ChangeEvent, useState } from 'react';
+import { Dosage } from '../../types';
+import { addDosageSendServer } from '../lib/reducer';
+import { useAction } from '../lib/utils';
 
 const AddButton = () => {
   const [amount, setAmount] = useState(0);
   const [open, setOpen] = useState(false);
+  const addDosageAction = useAction(addDosageSendServer);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = +e.target.value;
     if (val > 0) setAmount(val);
     else setAmount(0);
+  };
+
+  const submit = () => {
+    const dosage = {
+      amount: amount,
+      timestamp: Date.now(),
+    } as Dosage;
+
+    addDosageAction(dosage);
+    setOpen(false);
   };
 
   return (
@@ -47,6 +61,7 @@ const AddButton = () => {
           />
           <Button
             color="secondary"
+            onClick={submit}
             style={{
               marginTop: '2rem',
               width: '100%',

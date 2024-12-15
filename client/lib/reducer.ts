@@ -1,17 +1,20 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { Action } from '../../types';
-import { Dosage } from '../types';
+import { Action, Dosage } from '../../types';
 
 
 const dosagesSlice = createSlice({
   name: 'dosages',
   initialState: [] as Dosage[],
   reducers: {
-    addDosage: (state, action: Action<Dosage>) => {
+    addDosageSendServer: (state, action: Action<Dosage>) => {
       state.push(action.payload);
+      state.sort((a, b) => b.timestamp - a.timestamp);
+    },
+    setDosages: (state, action: Action<Dosage[]>) => {
+      return action.payload;
     },
   },
 });
 
-export const { addDosage } = dosagesSlice.actions;
+export const { addDosageSendServer, setDosages } = dosagesSlice.actions;
 export const dosagesReducer = dosagesSlice.reducer;

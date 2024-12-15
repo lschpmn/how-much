@@ -1,16 +1,17 @@
 import { Paper, Typography } from '@mui/material';
+import dayjs from 'dayjs';
+import { isEqual } from 'lodash';
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { Dosage } from '../../types';
+import { State } from '../types';
 
 const ListContainer = () => {
-
-  const things = [
-    'A: 5:00PM',
-    'B: 5:30PM',
-  ];
+  const dosages: Dosage[] = useSelector((state: State) => state.dosages, isEqual);
 
   return (
     <div>
-      {things.map((thing, i) => (
+      {dosages.map((dosage, i) => (
         <Paper
           key={i}
           elevation={6}
@@ -19,7 +20,8 @@ const ListContainer = () => {
             padding: '1rem',
           }}
         >
-          <Typography>{thing}</Typography>
+          <Typography>Amount: {dosage.amount}</Typography>
+          <Typography>Taken: {dayjs(dosage.timestamp).toString()}</Typography>
         </Paper>
       ))}
     </div>

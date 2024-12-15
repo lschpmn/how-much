@@ -5,9 +5,12 @@ import { Server, Socket } from 'socket.io';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
+import { setDosages } from '../client/lib/reducer';
 import { Action, EmitAction } from '../types';
 import webpackConfig from '../webpack.config';
-import { getCommandLineArguments, log, socketFunctions } from './lib/utils';
+import controls from './controls';
+import db from './lib/db';
+import { getCommandLineArguments, log } from './lib/utils';
 
 const { DEVELOP } = getCommandLineArguments();
 
@@ -15,12 +18,14 @@ export const connectSocket = (server: ServerType) => {
   // Socket.IO
   const io = new Server(server, { maxHttpBufferSize: 1024 * 1024 * 500 /*500MB*/ });
   io.on('connection', (socket: Socket) => {
+    const emitAction = createEmitActionFunc(socket);
     log('client connected');
-    const emitAction: EmitAction = createEmitActionFunc(socket);
 
     Object
-      .entries(socketFunctions)
-      .forEach(([actionType, func]) => socket.on(actionType, func(emitAction)));
+      .entries(controls)
+      .forEach(([actionType, func]): any => socket.on(actionType, func(emitAction)));
+
+    emitAction(setDosages(db.getDosages()), 'Client Init');
 
     socket.on('disconnect', () => log('client disconnected'));
   });
@@ -44,6 +49,6 @@ export const connectWeb = (app: Express) => {
 };
 
 const createEmitActionFunc = (socket: Socket): EmitAction => (action: Action<any>, reason?: string) => {
-  log(`Sending action ${action.type}` + (reason ? ` - ${reason}` : ''));
+  log(`Outgoing - ${action.type}` + (reason ? ` - ${reason}` : ''));
   socket.emit('action', action);
 };

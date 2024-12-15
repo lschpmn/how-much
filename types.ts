@@ -5,11 +5,16 @@ export type Action<T> = {
 };
 
 export type DbSchema = {
+  dosages: Dosage[],
+};
 
+export type Dosage = {
+  amount: number,
+  timestamp: number,
 };
 
 export type EmitAction = (action: Action<any>, reason?: string) => void
 
-export type SocketFunction = {
+export type SocketFunctions = {
   [actionType: string]: (emit: EmitAction) => (p?: any) => void
 };

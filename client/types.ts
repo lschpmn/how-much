@@ -1,8 +1,4 @@
-
-export type Dosage = {
-  amount: number,
-  time: Date,
-};
+import { Dosage } from '../types';
 
 export type State = {
   dosages: Dosage[],
