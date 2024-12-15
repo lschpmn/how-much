@@ -6,12 +6,13 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import App from './App';
 import { loggingMiddleware, socketMiddleware } from './lib/middleware';
+import { dosagesReducer } from './lib/reducer';
 
 const store = configureStore({
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware().concat([ loggingMiddleware, socketMiddleware ]),
   reducer: {
-
+    dosages: dosagesReducer,
   },
 });
 

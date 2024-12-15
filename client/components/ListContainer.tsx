@@ -1,4 +1,4 @@
-import { Paper } from '@mui/material';
+import { Paper, Typography } from '@mui/material';
 import React from 'react';
 
 const ListContainer = () => {
@@ -19,7 +19,7 @@ const ListContainer = () => {
             padding: '1rem',
           }}
         >
-          {thing}
+          <Typography>{thing}</Typography>
         </Paper>
       ))}
     </div>
