@@ -21,7 +21,7 @@ const ListContainer = () => {
           }}
         >
           <Typography>Amount: {dosage.amount}</Typography>
-          <Typography>Taken: {dayjs(dosage.timestamp).toString()}</Typography>
+          <Typography>Taken: {dayjs(dosage.timestamp).format('M/D/YY - h:mm A')}</Typography>
         </Paper>
       ))}
     </div>

@@ -8,6 +8,7 @@ import { useAction } from '../lib/utils';
 const AddButton = () => {
   const [isAM, setIsAM] = useState(true);
   const [open, setOpen] = useState(false);
+  const [isDisabled, setDisabled] = useState(true);
   const [amount, setAmount] = useState(0);
   const [hour, setHour] = useState(0);
   const [minute, setMinute] = useState(0);
@@ -37,8 +38,19 @@ const AddButton = () => {
       setHour(+now.format('h'));
       setMinute(now.minute());
       setIsAM(now.hour() < 12);
+      setAmount(0);
     }
   }, [open]);
+
+  useEffect(() => {
+    const checks = [
+      amount > 0,
+      hour > 0 && hour < 13,
+      minute > 0 && minute < 60
+    ];
+
+    setDisabled(!checks.every(a => a));
+  }, [hour, minute, amount]);
 
   return (
     <span>
@@ -81,9 +93,9 @@ const AddButton = () => {
             </Typography>
 
             <StyledTextField size="small" value={hour}
-                             onChange={e => setHour(+e.target.value)}
+                             onChange={e => setHour(+e.target.value || 0)}
                              variant="standard"/> :
-            <StyledTextField size="small" onChange={e => setMinute(+e.target.value)}
+            <StyledTextField size="small" onChange={e => setMinute(+e.target.value || 0)}
                              value={minute < 10 ? `0${minute}` : minute}
                              variant="standard"/>
 
@@ -91,6 +103,7 @@ const AddButton = () => {
           </div>
           <Button
             color="secondary"
+            disabled={isDisabled}
             onClick={submit}
             style={{
               width: '100%',
