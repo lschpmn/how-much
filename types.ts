@@ -16,5 +16,5 @@ export type Dosage = {
 export type EmitAction = (action: Action<any>, reason?: string) => void
 
 export type SocketFunctions = {
-  [actionType: string]: (emit: EmitAction) => (p?: any) => void
+  [actionType: string]: (emit: EmitAction) => (p?: any) => void,
 };

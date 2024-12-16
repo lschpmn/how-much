@@ -18,12 +18,16 @@ export const connectSocket = (server: ServerType) => {
   // Socket.IO
   const io = new Server(server, { maxHttpBufferSize: 1024 * 1024 * 500 /*500MB*/ });
   io.on('connection', (socket: Socket) => {
-    const emitAction = createEmitActionFunc(socket);
+    const emitAction = createOutgoingFunc(socket);
     log('client connected');
 
-    Object
-      .entries(controls)
-      .forEach(([actionType, func]): any => socket.on(actionType, func(emitAction)));
+    for (let actionType in controls) {
+      const func = controls[actionType];
+      socket.on(actionType, (p?: any) => {
+        log(`Incoming - ${actionType}`);
+        func(emitAction)(p);
+      });
+    }
 
     emitAction(setDosages(db.getDosages()), 'Client Init');
 
@@ -48,7 +52,7 @@ export const connectWeb = (app: Express) => {
   });
 };
 
-const createEmitActionFunc = (socket: Socket): EmitAction => (action: Action<any>, reason?: string) => {
+const createOutgoingFunc = (socket: Socket): EmitAction => (action: Action<any>, reason?: string) => {
   log(`Outgoing - ${action.type}` + (reason ? ` - ${reason}` : ''));
   socket.emit('action', action);
 };

@@ -6,7 +6,7 @@ import { log } from './lib/utils';
 const methods = {} as SocketFunctions;
 
 methods[addDosageSendServer.toString()] = (emit) => (dosage: Dosage) => {
-  log('Adding new dosage');
+  log(`Dosage:${dosage.amount}`);
   db.addDosage(dosage);
 };
 
