@@ -2,11 +2,14 @@ import { styled } from '@mui/material';
 import React from 'react';
 import AddButton from './components/AddButton';
 import ListContainer from './components/ListContainer';
+import TopBar from './components/TopBar';
 
 const App = () => {
 
   return (
     <Container>
+      <TopBar />
+
       <AddButton/>
 
       <ListContainer/>

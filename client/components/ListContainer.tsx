@@ -22,7 +22,7 @@ const ListContainer = () => {
   }, [dosages]);
 
   return (
-    <div>
+    <div style={{ marginTop: '3rem' }}>
       {dosages.map((dosage, i) => (
         <Paper
           key={i}
