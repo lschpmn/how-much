@@ -11,14 +11,6 @@ class DB {
   constructor() {
     if (exists(DB_PATH)) {
       this.data = read(DB_PATH, 'json');
-
-      // temp to normalize db
-      this.data.dosages = this.data.dosages.map(dosage => {
-        if (!dosage.id) dosage.id = Math.random().toString(36).slice(-8);
-
-        return dosage;
-      });
-      this.save();
     } else {
       this.data = {
         dosages: [],

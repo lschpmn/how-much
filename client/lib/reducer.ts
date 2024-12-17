@@ -15,8 +15,9 @@ const dosagesSlice = createSlice({
     },
     updateDosageAmounts: (state, action: Action<null>) => {
       state.forEach(dosage => {
-        const val = dosage.amount * Math.pow(0.5, (Date.now() - dosage.timestamp) / (30 * 60 * 1000));
-        dosage.currentAmount = Math.round(val * 100) / 100;
+        let val = dosage.amount * Math.pow(0.5, (Date.now() - dosage.timestamp) / (30 * 60 * 1000));
+        val = Math.round(val * 100) / 100;
+        dosage.currentAmount = Math.min(val, dosage.amount);
       });
     },
   },
