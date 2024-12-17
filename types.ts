@@ -10,6 +10,8 @@ export type DbSchema = {
 
 export type Dosage = {
   amount: number,
+  currentAmount?: number,
+  id: string,
   timestamp: number,
 };
 

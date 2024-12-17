@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { Dosage } from '../../types';
 import { addDosageSendServer } from '../lib/reducer';
-import { useAction } from '../lib/utils';
+import { getRndStr, useAction } from '../lib/utils';
 
 const AddButton = () => {
   const [isAM, setIsAM] = useState(true);
@@ -25,6 +25,7 @@ const AddButton = () => {
 
     const dosage = {
       amount: amount,
+      id: getRndStr(),
       timestamp: +now,
     } as Dosage;
 
