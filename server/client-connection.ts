@@ -8,7 +8,7 @@ import webpackHotMiddleware from 'webpack-hot-middleware';
 import { setDosages } from '../client/lib/reducer';
 import { Action, EmitAction } from '../types';
 import webpackConfig from '../webpack.config';
-import controls from './controls';
+import services from './services';
 import db from './lib/db';
 import { getCommandLineArguments, log } from './lib/utils';
 
@@ -21,8 +21,8 @@ export const connectSocket = (server: ServerType) => {
     const emitAction = createOutgoingFunc(socket);
     log('client connected');
 
-    for (let actionType in controls) {
-      const func = controls[actionType];
+    for (let actionType in services) {
+      const func = services[actionType];
       socket.on(actionType, (p?: any) => {
         log(`Incoming - ${actionType}`);
         func(emitAction)(p);

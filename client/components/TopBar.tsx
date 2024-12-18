@@ -11,7 +11,7 @@ const TopBar = () => {
   return (
     <AppBar>
       <Toolbar>
-        <Typography variant="h4">Total: {Math.round(total)}</Typography>
+        <Typography variant="h4">Total: {total < 10 ? total.toFixed(1) : Math.round(total)}</Typography>
       </Toolbar>
     </AppBar>
   );
