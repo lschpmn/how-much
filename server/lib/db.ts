@@ -26,6 +26,11 @@ class DB {
     this.save();
   }
 
+  deleteDosage(id: string) {
+    this.data.dosages = this.data.dosages.filter(d => d.id !== id);
+    this.save();
+  }
+
   getDosages(): Dosage[] {
     return cloneDeep(this.data.dosages);
   }

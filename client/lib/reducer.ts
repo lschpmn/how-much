@@ -10,18 +10,21 @@ const dosagesSlice = createSlice({
       state.push(action.payload);
       state.sort((a, b) => b.timestamp - a.timestamp);
     },
+    deleteDosageSendServer: (state, action: Action<string>) => {
+      const id = action.payload;
+      return state.filter(d => d.id !== id);
+    },
     setDosages: (state, action: Action<Dosage[]>) => {
       return action.payload;
     },
     updateDosageAmounts: (state, action: Action<null>) => {
       state.forEach(dosage => {
         let val = dosage.amount * Math.pow(0.5, (Date.now() - dosage.timestamp) / (30 * 60 * 1000));
-        val = Math.round(val * 100) / 100;
         dosage.currentAmount = Math.min(val, dosage.amount);
       });
     },
   },
 });
 
-export const { addDosageSendServer, setDosages, updateDosageAmounts } = dosagesSlice.actions;
+export const { addDosageSendServer, deleteDosageSendServer, setDosages, updateDosageAmounts } = dosagesSlice.actions;
 export const dosagesReducer = dosagesSlice.reducer;
