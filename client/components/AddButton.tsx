@@ -47,7 +47,7 @@ const AddButton = () => {
     const checks = [
       amount > 0,
       hour > 0 && hour < 13,
-      minute > 0 && minute < 60
+      minute > -1 && minute < 60
     ];
 
     setDisabled(!checks.every(a => a));
@@ -61,6 +61,7 @@ const AddButton = () => {
           bottom: 0,
           position: 'absolute',
           width: '100%',
+          zIndex: 10,
         }}
         variant="contained"
       >
