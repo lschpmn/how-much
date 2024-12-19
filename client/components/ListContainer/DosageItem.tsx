@@ -22,21 +22,21 @@ const DosageItem = ({ id }: { id: string }) => {
         padding: '1rem',
       }}
     >
-      <Typography style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span>Amount: {dosage.amount}</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Typography component="span">Amount: {dosage.amount}</Typography>
         {showDeleteIcon ? (
           <IconButton onClick={() => setShowDeleteIcon(false)}>
             <DeleteIcon fontSize="small" color="error"/>
           </IconButton>
         ) : (
-          <Typography>
-            Are you sure?
+          <span>
+            <Typography component="span">Are you sure?</Typography>
             <Button color="error" onClick={() => deleteDosageAction(id)}>Yes</Button>
             <Button color="success" onClick={() => setShowDeleteIcon(true)}>No</Button>
-          </Typography>
+          </span>
         )}
 
-      </Typography>
+      </div>
       <Typography>Taken: {dayjs(dosage.timestamp).format('M/D/YY - h:mm A')}</Typography>
       <Typography>Left: {Math.round(dosage.currentAmount)}</Typography>
       <LinearProgress variant="determinate" value={(dosage.currentAmount / dosage.amount) * 100}/>

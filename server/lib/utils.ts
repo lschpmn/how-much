@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-const DEFAULT_PORT = 4999;
+const DEFAULT_PORT = 4000;
 
 export const getCommandLineArguments = (): { PORT: number, DEVELOP: boolean } => {
   const { argv } = process;
