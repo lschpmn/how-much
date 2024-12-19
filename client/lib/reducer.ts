@@ -17,27 +17,25 @@ const dosagesSlice = createSlice({
     },
     setDosages: (state, action: Action<Dosage[]>) => {
       const newState = action.payload;
-      newState.forEach(dosage => {
-        const oldDosage = state.find(d => d.id === dosage.id);
-        if (oldDosage) dosage.currentAmount = oldDosage.currentAmount;
-      });
+      newState.forEach(setCurrentAmount(Date.now()));
 
       return newState;
     },
     updateDosageAmounts: (state, action: Action<null>) => {
-      const now = Date.now();
-      state.forEach(dosage => {
-        if (now - dosage.timestamp > MAXIMUM_TIME) {
-          dosage.currentAmount = 0;
-          return;
-        }
-
-        let val = dosage.amount * Math.pow(0.5, (Date.now() - dosage.timestamp) / (30 * 60 * 1000));
-        dosage.currentAmount = Math.min(val, dosage.amount);
-      });
+      state.forEach(setCurrentAmount(Date.now()));
     },
   },
 });
 
 export const { addDosageSendServer, deleteDosageSendServer, setDosages, updateDosageAmounts } = dosagesSlice.actions;
 export const dosagesReducer = dosagesSlice.reducer;
+
+const setCurrentAmount = (now: number) => (dosage: Dosage) => {
+  if (now - dosage.timestamp > MAXIMUM_TIME) {
+    dosage.currentAmount = 0;
+    return;
+  }
+
+  let val = dosage.amount * Math.pow(0.5, (Date.now() - dosage.timestamp) / (30 * 60 * 1000));
+  dosage.currentAmount = Math.min(val, dosage.amount);
+};
