@@ -18,14 +18,15 @@ export const connectSocket = (server: ServerType) => {
   // Socket.IO
   const io = new Server(server, { maxHttpBufferSize: 1024 * 1024 * 500 /*500MB*/ });
   io.on('connection', (socket: Socket) => {
-    const emitAction = createOutgoingFunc(socket);
     log('client connected');
+    const emitAction = createOutgoingFunc(socket);
+    const emitAllAction = createOutgoingAllFunc(io);
 
     for (let actionType in services) {
       const func = services[actionType];
       socket.on(actionType, (p?: any) => {
         log(`Incoming - ${actionType}`);
-        func(emitAction)(p);
+        func(emitAction, emitAllAction)(p);
       });
     }
 
@@ -55,4 +56,9 @@ export const connectWeb = (app: Express) => {
 const createOutgoingFunc = (socket: Socket): EmitAction => (action: Action<any>, reason?: string) => {
   log(`Outgoing - ${action.type}` + (reason ? ` - ${reason}` : ''));
   socket.emit('action', action);
+};
+
+const createOutgoingAllFunc = (io: Server): EmitAction => (action: Action<any>, reason?: string) => {
+  log(`Outgoing All - ${action.type}` + (reason ? ` - ${reason}` : ''));
+  io.emit('action', action);
 };

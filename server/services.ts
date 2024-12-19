@@ -1,18 +1,20 @@
-import { addDosageSendServer, deleteDosageSendServer } from '../client/lib/reducer';
+import { addDosageSendServer, deleteDosageSendServer, setDosages } from '../client/lib/reducer';
 import { Dosage, SocketFunctions } from '../types';
 import db from './lib/db';
 import { log } from './lib/utils';
 
 const methods = {} as SocketFunctions;
 
-methods[addDosageSendServer.toString()] = (emit) => (dosage: Dosage) => {
+methods[addDosageSendServer.toString()] = (emit, emitAll) => (dosage: Dosage) => {
   log(`Dosage:${dosage.amount}`);
   db.addDosage(dosage);
+  emitAll(setDosages(db.getDosages()));
 };
 
-methods[deleteDosageSendServer.toString()] = (emit) => (id: string) => {
+methods[deleteDosageSendServer.toString()] = (emit, emitAll) => (id: string) => {
   log(`Delete id ${id}`);
   db.deleteDosage(id);
+  emitAll(setDosages(db.getDosages()));
 };
 
 export default methods;
