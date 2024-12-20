@@ -8,7 +8,9 @@ const dosagesSlice = createSlice({
   initialState: [] as Dosage[],
   reducers: {
     addDosageSendServer: (state, action: Action<Dosage>) => {
-      state.push(action.payload);
+      const dosage = action.payload;
+      setCurrentAmount(Date.now())(dosage);
+      state.push(dosage);
       state.sort((a, b) => b.timestamp - a.timestamp);
     },
     deleteDosageSendServer: (state, action: Action<string>) => {
