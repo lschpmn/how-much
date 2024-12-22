@@ -3,12 +3,12 @@ import React, { useState } from 'react';
 import AddModal from './AddModal';
 
 const AddButton = () => {
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <span>
       <Button
-        onClick={() => setOpen(true)}
+        onClick={() => setIsOpen(true)}
         style={{
           bottom: 0,
           position: 'absolute',
@@ -19,7 +19,7 @@ const AddButton = () => {
       >
         <Typography>+</Typography>
       </Button>
-      <AddModal open={open} setOpen={setOpen}/>
+      <AddModal isOpen={isOpen} setOpen={setIsOpen}/>
     </span>
   );
 };
