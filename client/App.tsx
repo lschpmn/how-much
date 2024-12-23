@@ -1,5 +1,5 @@
 import { styled } from '@mui/material';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import AddButton from './components/AddButton';
 import ListContainer from './components/ListContainer';
 import TopBar from './components/TopBar';
@@ -8,12 +8,11 @@ import { useAction } from './lib/utils';
 
 const App = () => {
   const updateDosageAmountsAction = useAction(updateDosageAmounts);
-  const interval = useRef(null);
 
   useEffect(() => {
-    if (interval.current) clearInterval(interval.current);
+    const intervalId = setInterval(updateDosageAmountsAction, 15 * 1000);
 
-    interval.current = setInterval(updateDosageAmountsAction, 15 * 1000);
+    return () => clearInterval(intervalId);
   }, []);
 
   return (

@@ -19,12 +19,14 @@ const dosagesSlice = createSlice({
     },
     setDosages: (state, action: Action<Dosage[]>) => {
       const newState = action.payload;
-      newState.forEach(setCurrentAmount(Date.now()));
+      const now = Date.now();
+      newState.forEach(setCurrentAmount(now));
 
       return newState;
     },
     updateDosageAmounts: (state, action: Action<null>) => {
-      state.forEach(setCurrentAmount(Date.now()));
+      const now = Date.now();
+      state.forEach(setCurrentAmount(now));
     },
   },
 });
@@ -38,6 +40,6 @@ const setCurrentAmount = (now: number) => (dosage: Dosage) => {
     return;
   }
 
-  let val = dosage.amount * Math.pow(0.5, (Date.now() - dosage.timestamp) / (30 * 60 * 1000));
+  let val = dosage.amount * Math.pow(0.5, (now - dosage.timestamp) / (30 * 60 * 1000));
   dosage.currentAmount = Math.min(val, dosage.amount);
 };

@@ -19,7 +19,7 @@ const AddButton = () => {
       >
         <Typography>+</Typography>
       </Button>
-      <AddModal isOpen={isOpen} setOpen={setIsOpen}/>
+      <AddModal isOpen={isOpen} setIsOpen={setIsOpen}/>
     </span>
   );
 };

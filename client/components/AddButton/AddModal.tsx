@@ -8,10 +8,10 @@ import SetTimestamp from './SetTimestamp';
 
 type Props = {
   isOpen: boolean,
-  setOpen: (open: boolean) => void,
+  setIsOpen: (open: boolean) => void,
 };
 
-const AddModal = ({ isOpen, setOpen }: Props) => {
+const AddModal = ({ isOpen, setIsOpen }: Props) => {
   const [amount, setAmount] = useState(0);
   const [timestamp, setTimestamp] = useState(0);
   const addDosageAction = useAction(addDosageSendServer);
@@ -24,13 +24,13 @@ const AddModal = ({ isOpen, setOpen }: Props) => {
     } as Dosage;
 
     addDosageAction(dosage);
-    setOpen(false);
+    setIsOpen(false);
   };
 
   return (
     <Modal
       open={isOpen}
-      onClose={() => setOpen(false)}
+      onClose={() => setIsOpen(false)}
       style={{
         display: 'flex',
         justifyContent: 'center',

@@ -12,8 +12,11 @@ const SetTimestamp = ({ isOpen, setTimestamp }: Props) => {
   const [isPristine, setIsPristine] = useState(true);
   const [hour, setHour] = useState('');
   const [minute, setMinute] = useState('');
-  const intervalRef = useRef(null);
-  const wasOpenRef = useRef(false);
+
+  const changeAm = () => {
+    if (isPristine) setIsPristine(false);
+    setIsAM(!isAM);
+  };
 
   const changeMinute = (e: ChangeEvent<HTMLInputElement>) => {
     isPristine && setIsPristine(false);
@@ -41,24 +44,28 @@ const SetTimestamp = ({ isOpen, setTimestamp }: Props) => {
     if (!isPristine) {
       setTimestamp(+dayjs(`${hour} ${minute} ${isAM ? 'AM' : 'PM'}`, 'h mm A'));
     }
-  }, [hour, minute]);
+  }, [hour, minute, isAM]);
 
   useEffect(() => isOpen && setIsPristine(true), [isOpen]);
 
   useEffect(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
+    let intervalId: NodeJS.Timeout;
+
     const setTimesToNow = () => {
       const now = dayjs();
       setHour(now.format('h'));
       setMinute(now.format('mm'))
       setIsAM(now.hour() < 12);
       setTimestamp(+now);
+      console.log('update timestamp');
     };
 
     if (isPristine) {
       setTimesToNow();
-      intervalRef.current = setInterval(() => setTimesToNow(), 1000);
+      intervalId = setInterval(() => setTimesToNow(), 1000);
     }
+
+    return () => intervalId && clearInterval(intervalId);
   }, [isPristine]);
 
   return (
@@ -69,10 +76,7 @@ const SetTimestamp = ({ isOpen, setTimestamp }: Props) => {
       <Typography component="span"> : </Typography>
       <StyledTextField size="small" onChange={changeMinute} value={minute} variant="standard"/>
 
-      <Button color="inherit" onClick={() => {
-        if (isPristine) setIsPristine(false);
-        setIsAM(!isAM);
-      }}>
+      <Button color="inherit" onClick={() => changeAm()}>
         {isAM ? 'AM' : 'PM'}
       </Button>
     </div>
