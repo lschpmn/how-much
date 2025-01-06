@@ -4,7 +4,9 @@ import process from 'process';
 // nodemon needs to be "required" because it's special
 const nodemon = require('nodemon');
 
-const PORT = process.argv.includes('--port') ? process.argv[process.argv.indexOf('--port') + 1] : 4001;
+const DEVELOP_PORT = 50200;
+
+const PORT = process.argv.includes('--port') ? process.argv[process.argv.indexOf('--port') + 1] : DEVELOP_PORT;
 
 (async function () {
   const port = await getIncrementalPort(PORT);
