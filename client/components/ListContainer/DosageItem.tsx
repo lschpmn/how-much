@@ -6,11 +6,8 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Dosage } from '../../../types';
 import { deleteDosageSendServer } from '../../lib/reducer';
-import { useAction } from '../../lib/utils';
+import { constructRemainingStr, useAction } from '../../lib/utils';
 import { State } from '../../types';
-
-const HALF_LIFE = 30 * 60 * 1000;
-const TARGET_RATIO = 0.5;
 
 const DosageItem = ({ id }: { id: string }) => {
   const [showDeleteIcon, setShowDeleteIcon] = useState(true);
@@ -46,26 +43,11 @@ const DosageItem = ({ id }: { id: string }) => {
       </div>
       <Typography style={{ padding: '0.5rem 0 1rem 0' }}>
         {dayjs(dosage.timestamp).format('h:mm A')}
-        {dosage.currentAmount > 0.5 && constructRemainingStr(dosage)}
+        {dosage.currentAmount > 0.5 && ' - ' + constructRemainingStr(dosage.currentAmount)}
       </Typography>
       <LinearProgress variant="determinate" value={(dosage.currentAmount / dosage.amount) * 100}/>
     </Paper>
   );
 };
-
-function constructRemainingStr(dosage: Dosage) {
-  const ratio = TARGET_RATIO / dosage.currentAmount;
-  const halfLives = Math.log10(ratio) / Math.log10(0.5);
-  const time = halfLives * HALF_LIFE;
-  const minutes = Math.floor(time / (60 * 1000)) % 60;
-  const hours = Math.floor(time / (60 * 60 * 1000));
-  let returnStr = ' - ';
-
-  hours && (returnStr += `${hours}h `);
-  minutes && (returnStr += `${minutes}m `);
-  (hours === 0 && minutes === 0) && (returnStr += 'a few seconds ');
-
-  return returnStr + 'remaining';
-}
 
 export default DosageItem;
