@@ -30,6 +30,7 @@
     "@emotion/styled": "11.14.0",
     "@mui/icons-material": "6.2.0",
     "@mui/material": "6.2.0",
+    "@mui/x-charts": "7.23.6",
     "@pmmmwh/react-refresh-webpack-plugin": "0.5.15",
     "@reduxjs/toolkit": "2.5.0",
     "@types/bcrypt": "5.0.2",

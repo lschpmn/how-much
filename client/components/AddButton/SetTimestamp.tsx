@@ -57,7 +57,6 @@ const SetTimestamp = ({ isOpen, setTimestamp }: Props) => {
       setMinute(now.format('mm'))
       setIsAM(now.hour() < 12);
       setTimestamp(+now);
-      console.log('update timestamp');
     };
 
     if (isPristine) {
