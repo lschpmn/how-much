@@ -37,7 +37,7 @@ export const setGraphTimes = (amount: number, timestamp: number) => {
   while(times < 10000) {
     currentTimestamp += 60 * 1000;
     const currentAmount = calculateReducedValue(amount, currentTimestamp - startTime);
-    if (currentAmount < 0.5) times = Number.MAX_VALUE;
+    if (currentAmount < 1) times = Number.MAX_VALUE;
     else times++;
 
     timesArray.push({

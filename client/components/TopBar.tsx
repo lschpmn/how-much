@@ -20,8 +20,8 @@ const TopBar = () => {
 };
 
 const Remaining = ({ remaining }: { remaining: number }) => {
-  if (remaining > 4.95) {
-    return <Typography>{constructRemainingStr(remaining, 4.95)} until 5</Typography>
+  if (remaining > 1) {
+    return <Typography>{constructRemainingStr(remaining, 1)} until 1</Typography>
   } else if (remaining > 0.05) {
     return <Typography>{constructRemainingStr(remaining, 0.05)} until 0</Typography>
   } else {

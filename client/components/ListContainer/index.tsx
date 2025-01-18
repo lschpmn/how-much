@@ -26,7 +26,7 @@ const ListContainer = () => {
           {showAll ? 'Showing All' : 'Showing Active'}
         </StyleButton>
         <StyleButton color="inherit" onClick={() => setShowGraph(!showGraph)} variant="outlined">
-          {showGraph ? 'Show Graph' : 'Hide Graph'}
+          {showGraph ? 'Showing Graph' : 'Hiding Graph'}
         </StyleButton>
       </Paper>
 
@@ -36,8 +36,11 @@ const ListContainer = () => {
           dataset={graphVals}
           xAxis={[{
             dataKey: 'timestamp',
+            max: graphVals.slice(-1)[0].timestamp,
+            min: graphVals[0].timestamp,
             valueFormatter: value => dayjs(value).format('hh:mma'),
           }]}
+          yAxis={[{ max: total, min: 1 }]}
           series={[{ area: true, dataKey: 'amount', showMark: false }]}
           height={300}
         />
@@ -51,7 +54,7 @@ const ListContainer = () => {
 };
 
 const StyleButton = styled(Button)`
-    margin: 0 0.5rem;
+    margin: 0.5rem;
 `;
 
 export default ListContainer;
