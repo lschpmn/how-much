@@ -1,9 +1,11 @@
 import { Button, Paper, styled } from '@mui/material';
 import { LineChart } from '@mui/x-charts/LineChart';
+import dayjs from 'dayjs';
 import { isEqual } from 'lodash';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Dosage } from '../../../types';
+import { setGraphTimes } from '../../lib/utils';
 import { State } from '../../types';
 import DosageItem from './DosageItem';
 
@@ -13,6 +15,9 @@ const ListContainer = () => {
   const dosages: Dosage[] = useSelector((state: State) => state.dosages, isEqual);
 
   const filteredDosages = dosages.filter(d => showAll || d.currentAmount > 0.5).slice(0, 100);
+
+  const total = dosages.reduce((t, d) => t + (d.currentAmount || 0), 0);
+  const graphVals = dosages[0] && setGraphTimes(total, Date.now());
 
   return (
     <div style={{ margin: '3.5rem 0 2rem 0' }}>
@@ -25,16 +30,15 @@ const ListContainer = () => {
         </StyleButton>
       </Paper>
 
-      {showGraph && (
+      {showGraph && graphVals && total > 1 && (
         <LineChart
-          xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
-          series={[
-            {
-              data: [2, 5.5, 2, 8.5, 1.5, 5],
-              area: true,
-            },
-          ]}
-          width={500}
+          grid={{ horizontal: true, vertical: true }}
+          dataset={graphVals}
+          xAxis={[{
+            dataKey: 'timestamp',
+            valueFormatter: value => dayjs(value).format('hh:mma'),
+          }]}
+          series={[{ area: true, dataKey: 'amount', showMark: false }]}
           height={300}
         />
       )}

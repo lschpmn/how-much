@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Action, Dosage } from '../../types';
+import { calculateReducedValue } from './utils';
 
 const MAXIMUM_TIME = 6 * 60 * 60 * 1000;
 
@@ -40,6 +41,6 @@ const setCurrentAmount = (now: number) => (dosage: Dosage) => {
     return;
   }
 
-  let val = dosage.amount * Math.pow(0.5, (now - dosage.timestamp) / (30 * 60 * 1000));
+  let val = calculateReducedValue(dosage.amount, now - dosage.timestamp);
   dosage.currentAmount = Math.min(val, dosage.amount);
 };
