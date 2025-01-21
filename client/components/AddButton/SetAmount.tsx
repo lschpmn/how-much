@@ -20,6 +20,9 @@ const SetAmount = ({ amount, setAmount }: Props) => {
       case 'small':
         setAmount(10);
         break;
+      case 'medium':
+        setAmount(25);
+        break;
       case 'large':
         setAmount(100);
         break;
@@ -33,6 +36,7 @@ const SetAmount = ({ amount, setAmount }: Props) => {
     <div>
       <ToggleButtonGroup color="primary" value={preset} style={{ marginBottom: '1rem', display: 'block' }}>
         <ToggleButton onChange={() => setPreset('small')} value="small">Small</ToggleButton>
+        <ToggleButton onChange={() => setPreset('medium')} value="medium">Medium</ToggleButton>
         <ToggleButton onChange={() => setPreset('large')} value="large">Large</ToggleButton>
         <ToggleButton onChange={() => setPreset('custom')} value="custom">Custom</ToggleButton>
       </ToggleButtonGroup>
