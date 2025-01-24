@@ -25,10 +25,12 @@ export function constructRemainingStr(currentAmount: number, targetRatio: number
 export const getRndStr = (): string => Math.random().toString(36).slice(-8);
 
 export const setGraphTimes = (amount: number, timestamp: number) => {
-  const startTime = Math.floor(timestamp / 1000) * 1000;
-  const timesArray: { timestamp: number, amount: number }[] = [];
+  const startTime = timestamp - (timestamp % 60000);
+  const timesArray: ({ timestamp: number} & Partial<Record<`amount-${string}`, number>>)[] = [];
   timesArray.push({
-    amount,
+    [`amount-test1`]: amount,
+    [`amount-test2`]: amount,
+    [`amount-test3`]: amount,
     timestamp: startTime,
   });
 
@@ -37,11 +39,11 @@ export const setGraphTimes = (amount: number, timestamp: number) => {
   while(times < 10000) {
     currentTimestamp += 60 * 1000;
     const currentAmount = calculateReducedValue(amount, currentTimestamp - startTime);
-    if (currentAmount < 1) times = Number.MAX_VALUE;
+    if (currentAmount < 0.05) times = Number.MAX_VALUE;
     else times++;
 
     timesArray.push({
-      amount: currentAmount,
+      [`amount-test1`]: currentAmount,
       timestamp: currentTimestamp,
     });
   }

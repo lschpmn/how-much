@@ -1,7 +1,6 @@
 import { AppBar, Toolbar, Typography } from '@mui/material';
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { constructRemainingStr } from '../lib/utils';
 import { State } from '../types';
 
 const TopBar = () => {
@@ -13,20 +12,9 @@ const TopBar = () => {
     <AppBar>
       <Toolbar style={{ display: 'flex', flexDirection: 'column' }}>
         <Typography variant="h4">Total: {total < 9.95 ? total.toFixed(1) : Math.round(total)}</Typography>
-        <Remaining remaining={total}/>
       </Toolbar>
     </AppBar>
   );
-};
-
-const Remaining = ({ remaining }: { remaining: number }) => {
-  if (remaining > 1) {
-    return <Typography>{constructRemainingStr(remaining, 1)} until 1</Typography>
-  } else if (remaining > 0.05) {
-    return <Typography>{constructRemainingStr(remaining, 0.05)} until 0</Typography>
-  } else {
-    return "";
-  }
 };
 
 export default TopBar;

@@ -1,13 +1,11 @@
 import { Button, Paper, styled } from '@mui/material';
-import { LineChart } from '@mui/x-charts/LineChart';
-import dayjs from 'dayjs';
 import { isEqual } from 'lodash';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Dosage } from '../../../types';
-import { setGraphTimes } from '../../lib/utils';
 import { State } from '../../types';
 import DosageItem from './DosageItem';
+import GraphComponent from './GraphComponent';
 
 const ListContainer = () => {
   const [showAll, setShowAll] = useState(false);
@@ -17,7 +15,6 @@ const ListContainer = () => {
   const filteredDosages = dosages.filter(d => showAll || d.currentAmount > 0.5).slice(0, 100);
 
   const total = dosages.reduce((t, d) => t + (d.currentAmount || 0), 0);
-  const graphVals = dosages[0] && setGraphTimes(total, Date.now());
 
   return (
     <div style={{ margin: '3.5rem 0 2rem 0' }}>
@@ -26,24 +23,12 @@ const ListContainer = () => {
           {showAll ? 'Showing All' : 'Showing Active'}
         </StyleButton>
         <StyleButton color="inherit" onClick={() => setShowGraph(!showGraph)} variant="outlined">
-          {showGraph ? 'Showing Graph' : 'Hiding Graph'}
+          {showGraph && total > 0.05 ? 'Showing Graph' : 'Hiding Graph'}
         </StyleButton>
       </Paper>
 
-      {showGraph && graphVals && total > 1 && (
-        <LineChart
-          grid={{ horizontal: true, vertical: true }}
-          dataset={graphVals}
-          xAxis={[{
-            dataKey: 'timestamp',
-            max: graphVals.slice(-1)[0].timestamp,
-            min: graphVals[0].timestamp,
-            valueFormatter: value => dayjs(value).format('hh:mma'),
-          }]}
-          yAxis={[{ max: total, min: 1 }]}
-          series={[{ area: true, dataKey: 'amount', showMark: false }]}
-          height={300}
-        />
+      {showGraph && total > 0.05 && (
+        <GraphComponent total={total}/>
       )}
 
       {filteredDosages.map(dosage => (
