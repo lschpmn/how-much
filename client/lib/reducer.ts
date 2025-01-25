@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Action, Dosage } from '../../types';
-import { calculateReducedValue } from './utils';
+import { calculateReducedValue, calculateTimeVals } from './utils';
 
 const MAXIMUM_TIME = 6 * 60 * 60 * 1000;
 
@@ -11,6 +11,7 @@ const dosagesSlice = createSlice({
     addDosageSendServer: (state, action: Action<Dosage>) => {
       const dosage = action.payload;
       setCurrentAmount(Date.now())(dosage);
+      setTimeValues(dosage);
       state.push(dosage);
       state.sort((a, b) => b.timestamp - a.timestamp);
     },
@@ -22,6 +23,7 @@ const dosagesSlice = createSlice({
       const newState = action.payload;
       const now = Date.now();
       newState.forEach(setCurrentAmount(now));
+      newState.forEach(setTimeValues);
 
       return newState;
     },
@@ -34,6 +36,10 @@ const dosagesSlice = createSlice({
 
 export const { addDosageSendServer, deleteDosageSendServer, setDosages, updateDosageAmounts } = dosagesSlice.actions;
 export const dosagesReducer = dosagesSlice.reducer;
+
+const setTimeValues = (dosage: Dosage) => {
+  dosage.timeValues = calculateTimeVals(dosage.amount, dosage.timestamp);
+};
 
 const setCurrentAmount = (now: number) => (dosage: Dosage) => {
   if (now - dosage.timestamp > MAXIMUM_TIME) {

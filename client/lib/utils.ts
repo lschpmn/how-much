@@ -7,6 +7,31 @@ const TARGET_RATIO = 0.5;
 export const calculateReducedValue = (startingAmount: number, timeElapsed: number) =>
   startingAmount * Math.pow(0.5, timeElapsed / HALF_LIFE);
 
+export const calculateTimeVals = (amount: number, timestamp: number) => {
+  const startTime = timestamp - (timestamp % 60000);
+  const timesArray: { amount: number, timestamp: number }[] = [];
+  timesArray.push({
+    amount,
+    timestamp: startTime,
+  });
+
+  let times = 0;
+  let currentTimestamp = startTime;
+  while(times < 10000) {
+    currentTimestamp += 60 * 1000;
+    const currentAmount = calculateReducedValue(amount, currentTimestamp - startTime);
+    if (currentAmount < 0.05) times = Number.MAX_VALUE;
+    else times++;
+
+    timesArray.push({
+      amount: currentAmount,
+      timestamp: currentTimestamp,
+    });
+  }
+
+  return timesArray;
+};
+
 export function constructRemainingStr(currentAmount: number, targetRatio: number=TARGET_RATIO) {
   const ratio = targetRatio / currentAmount;
   const halfLives = Math.log10(ratio) / Math.log10(0.5);
