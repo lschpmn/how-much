@@ -2,18 +2,15 @@ import { LineChart } from '@mui/x-charts/LineChart';
 import dayjs from 'dayjs';
 import React from 'react';
 import { Dosage } from '../../../types';
-import { setGraphTimes } from '../../lib/utils';
 
 type Props = {
   dosages: Dosage[],
-  total: number,
 };
 
-const GraphComponent = ({ dosages, total }: Props) => {
-  const graphVals = setGraphTimes(total, Date.now());
-  const axis = total > 2 ? 1 : 0.05;
+const GraphComponent = ({ dosages }: Props) => {
   const zipped = zipTogetherTimeValues(dosages);
-  const ids = Object.keys(zipped[0]).filter(p => p !== 'timestamp');
+  const amounts = Object.keys(zipped[0]).filter(k => k !== 'timestamp');
+  const [xMax, xMin, yMax, yMin] = getGraphEdges(zipped, amounts);
 
   return (
     <LineChart
@@ -21,26 +18,42 @@ const GraphComponent = ({ dosages, total }: Props) => {
       dataset={zipped}
       xAxis={[{
         dataKey: 'timestamp',
-        max: graphVals.find(gv => gv['amount-test1'] < axis)?.timestamp,
-        min: graphVals[0].timestamp,
+        max: xMax,
+        min: xMin,
         valueFormatter: value => dayjs(value).format('hh:mma'),
       }]}
-      yAxis={[{ max: total, min: axis }]}
-      series={ids.map(id => ({
+      yAxis={[{ max: yMax, min: yMin }]}
+      series={amounts.map(amountId => ({
         area: true,
-        dataKey: id,
+        dataKey: amountId,
         showMark: false,
         stack: 'timestamp',
-        stackOrder: 'ascending'
+        stackOrder: 'ascending',
       }))}
       height={300}
     />
   );
 };
 
+const getGraphEdges = (zipped: ZippedDosages, amounts: string[]) => {
+  const yMax = amounts.reduce((p, c) => zipped[0][c] + p, 0);
+  const yMin = yMax > 2 ? 1 : 0.001
+  const xMin = zipped[0].timestamp;
+
+  const minIndex = yMax > 2
+    ? zipped.findIndex(zip => amounts.reduce((p, c) => (zip[c] || 0) + p, 0) < 1)
+    : zipped.length - 1;
+
+  const xMax = zipped[minIndex].timestamp;
+
+  return [xMax, xMin, yMax, yMin];
+};
+
+type ZippedDosages = ({ timestamp: number } & { [key in `amount-${string}`]: number })[];
+
 const zipTogetherTimeValues = (dosages: Dosage[], now=Date.now()) => {
   const nowMinute = now - (now % 60000);
-  const combinedTimeVals: ({ timestamp: number } & { [key in `amount-${string}`]: number })[] = [];
+  const combinedTimeVals: ZippedDosages = [];
 
   for (let dosage of dosages) {
     const startIndex = dosage.timeValues.findIndex(tv => tv.timestamp === nowMinute);

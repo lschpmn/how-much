@@ -11,12 +11,6 @@ class DB {
   constructor() {
     if (exists(DB_PATH)) {
       this.data = read(DB_PATH, 'json');
-
-      this.data.dosages.forEach(dosage => {
-        delete dosage.currentAmount;
-        delete dosage.timeValues;
-      });
-      this.save();
     } else {
       this.data = {
         dosages: [],

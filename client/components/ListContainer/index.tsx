@@ -23,12 +23,12 @@ const ListContainer = () => {
           {showAll ? 'Showing All' : 'Showing Active'}
         </StyleButton>
         <StyleButton color="inherit" onClick={() => setShowGraph(!showGraph)} variant="outlined">
-          {showGraph && total > 0.05 ? 'Showing Graph' : 'Hiding Graph'}
+          {showGraph && total > 0.001 ? 'Showing Graph' : 'Hiding Graph'}
         </StyleButton>
       </Paper>
 
-      {showGraph && total > 0.05 && (
-        <GraphComponent dosages={dosages} total={total}/>
+      {showGraph && total > 0.001 && (
+        <GraphComponent dosages={dosages}/>
       )}
 
       {filteredDosages.map(dosage => (
