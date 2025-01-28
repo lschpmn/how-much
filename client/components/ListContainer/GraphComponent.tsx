@@ -27,9 +27,15 @@ const GraphComponent = ({ dosages }: Props) => {
       showMark: false,
       stack: 'timestamp',
       stackOrder: 'ascending' as StackOrderType,
-      valueFormatter: v => v?.toFixed(3),
+      valueFormatter: v => v?.toFixed(yMax > 2 ? 1 : 3),
     })),
   ];
+
+  if (yMax > 2) {
+    zipped.map(zip => amounts.forEach(amount => {
+      if (zip[amount] < 0.1) delete zip[amount];
+    }));
+  }
 
   return (
     <LineChart
