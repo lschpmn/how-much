@@ -1,3 +1,5 @@
+import { LineSeriesType, StackOrderType } from '@mui/x-charts';
+import { MakeOptional } from '@mui/x-charts/internals';
 import { LineChart } from '@mui/x-charts/LineChart';
 import dayjs from 'dayjs';
 import React from 'react';
@@ -9,8 +11,25 @@ type Props = {
 
 const GraphComponent = ({ dosages }: Props) => {
   const zipped = zipTogetherTimeValues(dosages);
-  const amounts = Object.keys(zipped[0]).filter(k => k !== 'timestamp');
+  const amounts = Object.keys(zipped[0]).filter(k => k !== 'timestamp' && k !== 'amount-total');
   const [xMax, xMin, yMax, yMin] = getGraphEdges(zipped, amounts);
+
+  const series: MakeOptional<LineSeriesType, 'type'>[] = [
+    {
+      color: '#121212',
+      dataKey: 'amount-total',
+      showMark: false,
+      valueFormatter: v => 'Total: ' + v?.toFixed(3),
+    },
+    ...amounts.map(amountId => ({
+      area: true,
+      dataKey: amountId,
+      showMark: false,
+      stack: 'timestamp',
+      stackOrder: 'ascending' as StackOrderType,
+      valueFormatter: v => v?.toFixed(3),
+    })),
+  ];
 
   return (
     <LineChart
@@ -23,13 +42,7 @@ const GraphComponent = ({ dosages }: Props) => {
         valueFormatter: value => dayjs(value).format('hh:mma'),
       }]}
       yAxis={[{ max: yMax, min: yMin }]}
-      series={amounts.map(amountId => ({
-        area: true,
-        dataKey: amountId,
-        showMark: false,
-        stack: 'timestamp',
-        stackOrder: 'ascending',
-      }))}
+      series={series}
       height={300}
     />
   );
@@ -37,7 +50,7 @@ const GraphComponent = ({ dosages }: Props) => {
 
 const getGraphEdges = (zipped: ZippedDosages, amounts: string[]) => {
   const yMax = amounts.reduce((p, c) => zipped[0][c] + p, 0);
-  const yMin = yMax > 2 ? 1 : 0.001
+  const yMin = yMax > 2 ? 1 : 0.001;
   const xMin = zipped[0].timestamp;
 
   const minIndex = yMax > 2
@@ -60,17 +73,28 @@ const zipTogetherTimeValues = (dosages: Dosage[], now=Date.now()) => {
     if (startIndex === -1) continue;
     const timeValuesSlice = dosage.timeValues.slice(startIndex);
 
-    for (let x = 0;x < timeValuesSlice.length;x++) {
+    for (let x = 0; x < timeValuesSlice.length; x++) {
       const currTimeValue = timeValuesSlice[x];
       let combined = combinedTimeVals[x];
       if (!combined) {
-        combined = { timestamp: currTimeValue.timestamp };
+        combined = { 'amount-total': 0, timestamp: currTimeValue.timestamp };
         combinedTimeVals.push(combined);
       }
 
       combined[`amount-${dosage.id}`] = currTimeValue.amount;
     }
   }
+
+  combinedTimeVals.forEach(timeVal => {
+    const amounts = Object.keys(timeVal).filter(k => k !== 'timestamp' && k !== 'amount-total');
+    let total = 0;
+
+    for (let amount of amounts) {
+      total += (timeVal[amount] || 0);
+    }
+
+    timeVal['amount-total'] = total;
+  });
 
   return combinedTimeVals;
 };
