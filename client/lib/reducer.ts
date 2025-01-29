@@ -38,7 +38,8 @@ export const { addDosageSendServer, deleteDosageSendServer, setDosages, updateDo
 export const dosagesReducer = dosagesSlice.reducer;
 
 const setTimeValues = (dosage: Dosage) => {
-  dosage.timeValues = calculateTimeVals(dosage.amount, dosage.timestamp);
+  if (Date.now() - dosage.timestamp > MAXIMUM_TIME) dosage.timeValues = [];
+  else dosage.timeValues = calculateTimeVals(dosage.amount, dosage.timestamp);
 };
 
 const setCurrentAmount = (now: number) => (dosage: Dosage) => {

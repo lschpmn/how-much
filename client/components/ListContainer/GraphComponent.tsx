@@ -4,6 +4,7 @@ import { LineChart } from '@mui/x-charts/LineChart';
 import dayjs from 'dayjs';
 import React from 'react';
 import { Dosage } from '../../../types';
+import { ZippedDosage } from '../../types';
 
 type Props = {
   dosages: Dosage[],
@@ -54,7 +55,7 @@ const GraphComponent = ({ dosages }: Props) => {
   );
 };
 
-const getGraphEdges = (zipped: ZippedDosages, amounts: string[]) => {
+const getGraphEdges = (zipped: ZippedDosage[], amounts: string[]) => {
   const yMax = amounts.reduce((p, c) => zipped[0][c] + p, 0);
   const yMin = yMax > 2 ? 1 : 0.001;
   const xMin = zipped[0].timestamp;
@@ -68,11 +69,11 @@ const getGraphEdges = (zipped: ZippedDosages, amounts: string[]) => {
   return [xMax, xMin, yMax, yMin];
 };
 
-type ZippedDosages = ({ timestamp: number } & { [key in `amount-${string}`]: number })[];
+
 
 const zipTogetherTimeValues = (dosages: Dosage[], now=Date.now()) => {
   const nowMinute = now - (now % 60000);
-  const combinedTimeVals: ZippedDosages = [];
+  const combinedTimeVals: ZippedDosage[] = [];
 
   for (let dosage of dosages) {
     const startIndex = dosage.timeValues.findIndex(tv => tv.timestamp === nowMinute);
