@@ -20,19 +20,19 @@ const GraphComponent = ({ dosages }: Props) => {
       color: '#121212',
       dataKey: 'amount-total',
       showMark: false,
-      valueFormatter: v => 'Total: ' + v?.toFixed(3),
+      valueFormatter: v => 'Total: ' + v?.toFixed(yMax > 4 ? 1 : 3),
     },
     ...amounts.map(amountId => ({
       area: true,
       dataKey: amountId,
       showMark: false,
       stack: 'timestamp',
-      stackOrder: 'ascending' as StackOrderType,
-      valueFormatter: v => v?.toFixed(yMax > 2 ? 1 : 3),
+      stackOrder: 'reverse' as StackOrderType,
+      valueFormatter: v => v?.toFixed(yMax > 4 ? 1 : 3),
     })),
   ];
 
-  if (yMax > 2) {
+  if (yMax > 4) {
     zipped.map(zip => amounts.forEach(amount => {
       if (zip[amount] < 0.1) delete zip[amount];
     }));
@@ -57,10 +57,10 @@ const GraphComponent = ({ dosages }: Props) => {
 
 const getGraphEdges = (zipped: ZippedDosage[], amounts: string[]) => {
   const yMax = amounts.reduce((p, c) => zipped[0][c] + p, 0);
-  const yMin = yMax > 2 ? 1 : 0.001;
+  const yMin = yMax > 4 ? 1 : 0.001;
   const xMin = zipped[0].timestamp;
 
-  const minIndex = yMax > 2
+  const minIndex = yMax > 4
     ? zipped.findIndex(zip => amounts.reduce((p, c) => (zip[c] || 0) + p, 0) < 1)
     : zipped.length - 1;
 
