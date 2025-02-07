@@ -47,6 +47,11 @@ export function constructRemainingStr(currentAmount: number, targetRatio: number
   return returnStr + 'remaining';
 }
 
+export const getNowMinute = (): number => {
+  const now = Date.now();
+  return now - (now % 60000);
+};
+
 export const getRndStr = (): string => Math.random().toString(36).slice(-8);
 
 export const useAction = <T extends Function>(action: T, deps?): T => {

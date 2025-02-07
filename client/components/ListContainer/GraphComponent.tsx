@@ -4,27 +4,34 @@ import { LineChart } from '@mui/x-charts/LineChart';
 import dayjs from 'dayjs';
 import React from 'react';
 import { Dosage } from '../../../types';
-import { ZippedDosage } from '../../types';
+import { getNowMinute } from '../../lib/utils';
+import { CombinedDosage } from '../../types';
 
 type Props = {
   dosages: Dosage[],
 };
 
 const GraphComponent = ({ dosages }: Props) => {
-  const zipped = zipTogetherTimeValues(dosages);
-  const amounts = Object.keys(zipped[0]).filter(k => k !== 'timestamp' && k !== 'amount-total');
-  const [xMax, xMin, yMax, yMin] = getGraphEdges(zipped, amounts);
+  const combinedTimeValObj = calculateCombinedTimeVals(dosages);
+  const nowMinute = getNowMinute();
+
+  if (!combinedTimeValObj[nowMinute]) return <h3>No Remaining Amount</h3>;
+
+  const combinedTimeVals = Object.values(combinedTimeValObj).sort((a, b) => a.timestamp - b.timestamp);
+  const nowTimeVal = combinedTimeValObj[nowMinute];
+  const amounts = Object.keys(nowTimeVal).filter(k => k !== 'timestamp' && k !== 'amount-total');
+  const [xMax, xMin, yMax, yMin] = getGraphEdges(combinedTimeVals.filter(d => d.timestamp >= nowMinute), amounts);
 
   if (yMax > 4) {
-    zipped.map(zip => amounts.forEach(amount => {
-      if (zip[amount] < 0.1) delete zip[amount];
+    combinedTimeVals.map(combinedTimeVal => amounts.forEach(amount => {
+      if (combinedTimeVal[amount] < 0.1) delete combinedTimeVal[amount];
     }));
   }
 
   return (
     <LineChart
       grid={{ horizontal: true, vertical: true }}
-      dataset={zipped}
+      dataset={combinedTimeVals}
       xAxis={[{
         dataKey: 'timestamp',
         max: xMax,
@@ -53,47 +60,39 @@ const getSeries = (amounts: string[], yMax: number): MakeOptional<LineSeriesType
     stackOrder: 'reverse' as StackOrderType,
     valueFormatter: v => v?.toFixed(yMax > 4 ? 1 : 3),
   })),
-]
+];
 
-const getGraphEdges = (zipped: ZippedDosage[], amounts: string[]) => {
-  const yMax = amounts.reduce((p, c) => zipped[0][c] + p, 0);
+const getGraphEdges = (combinedTimeVals: CombinedDosage[], amounts: string[]) => {
+  const yMax = amounts.reduce((p, c) => combinedTimeVals[0][c] + p, 0);
   const yMin = yMax > 4 ? 1 : 0.001;
-  const xMin = zipped[0].timestamp;
+  const xMin = combinedTimeVals[0].timestamp;
 
   const minIndex = yMax > 4
-    ? zipped.findIndex(zip => amounts.reduce((p, c) => (zip[c] || 0) + p, 0) < 1)
-    : zipped.length - 1;
+    ? combinedTimeVals.findIndex(zip => amounts.reduce((p, c) => (zip[c] || 0) + p, 0) < 1)
+    : combinedTimeVals.length - 1;
 
-  const xMax = zipped[minIndex].timestamp;
+  const xMax = combinedTimeVals[minIndex].timestamp;
 
   return [xMax, xMin, yMax, yMin];
 };
 
-
-
-const zipTogetherTimeValues = (dosages: Dosage[], now=Date.now()) => {
-  const nowMinute = now - (now % 60000);
-  const combinedTimeVals: ZippedDosage[] = [];
+const calculateCombinedTimeVals = (dosages: Dosage[]): { [timestamp: number]: CombinedDosage } => {
+  const timeValObj: { [timestamp: number]: CombinedDosage } = {};
 
   for (let dosage of dosages) {
-    const startIndex = dosage.timeValues.findIndex(tv => tv.timestamp === nowMinute);
-    if (startIndex === -1) continue;
-    const timeValuesSlice = dosage.timeValues.slice(startIndex);
-
-    for (let x = 0; x < timeValuesSlice.length; x++) {
-      const currTimeValue = timeValuesSlice[x];
-      let combined = combinedTimeVals[x];
-      if (!combined) {
-        combined = { 'amount-total': 0, timestamp: currTimeValue.timestamp };
-        combinedTimeVals.push(combined);
+    for (let timeVal of dosage.timeValues) {
+      let currTimeValue = timeValObj[timeVal.timestamp];
+      if (!currTimeValue) {
+        currTimeValue = { 'amount-total': 0, timestamp: timeVal.timestamp };
+        timeValObj[timeVal.timestamp] = currTimeValue;
       }
 
-      combined[`amount-${dosage.id}`] = currTimeValue.amount;
-      combined['amount-total'] += currTimeValue.amount;
+      currTimeValue[`amount-${dosage.id}`] = timeVal.amount;
+      currTimeValue['amount-total'] += timeVal.amount;
     }
   }
 
-  return combinedTimeVals;
+  return timeValObj;
 };
 
 export default GraphComponent;

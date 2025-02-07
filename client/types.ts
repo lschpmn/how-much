@@ -4,4 +4,4 @@ export type State = {
   dosages: Dosage[],
 };
 
-export type ZippedDosage = { timestamp: number } & { [key in `amount-${string}`]: number };
+export type CombinedDosage = { timestamp: number } & { [key in `amount-${string}`]: number };
