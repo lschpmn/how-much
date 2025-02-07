@@ -1,8 +1,9 @@
 import { Button, Paper, styled } from '@mui/material';
 import { isEqual } from 'lodash';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Dosage } from '../../../types';
+import { getNowMinute } from '../../lib/utils';
 import { State } from '../../types';
 import DosageItem from './DosageItem';
 import GraphComponent from './GraphComponent';
@@ -12,6 +13,8 @@ const ListContainer = () => {
   const [showGraph, setShowGraph] = useState(false);
   const dosages: Dosage[] = useSelector((state: State) => state.dosages, isEqual);
   const filteredDosages = dosages.filter(d => showAll || d.currentAmount > 0.5).slice(0, 100);
+
+  const MemoedGraph = useMemo(() => () => <GraphComponent dosages={dosages}/>, [dosages.length, getNowMinute()])
 
   return (
     <div style={{ margin: '3.5rem 0 2rem 0' }}>
@@ -25,9 +28,7 @@ const ListContainer = () => {
       </Paper>
 
       {showGraph && (
-        <span style={{ userSelect: 'none' }}>
-          <GraphComponent dosages={dosages}/>
-        </span>
+        <span style={{ userSelect: 'none' }}><MemoedGraph /></span>
       )}
 
       {filteredDosages.map(dosage => (

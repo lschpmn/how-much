@@ -1,3 +1,4 @@
+import { Typography } from '@mui/material';
 import { LineSeriesType, StackOrderType } from '@mui/x-charts';
 import { MakeOptional } from '@mui/x-charts/internals';
 import { LineChart } from '@mui/x-charts/LineChart';
@@ -15,7 +16,8 @@ const GraphComponent = ({ dosages }: Props) => {
   const combinedTimeValObj = calculateCombinedTimeVals(dosages);
   const nowMinute = getNowMinute();
 
-  if (!combinedTimeValObj[nowMinute]) return <h3>No Remaining Amount</h3>;
+  if (!combinedTimeValObj[nowMinute])
+    return <Typography color="textPrimary" style={{ textAlign: 'center' }} variant="h3">No Remaining Amount</Typography>;
 
   const combinedTimeVals = Object.values(combinedTimeValObj).sort((a, b) => a.timestamp - b.timestamp);
   const nowTimeVal = combinedTimeValObj[nowMinute];
