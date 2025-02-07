@@ -30,7 +30,9 @@ const ListContainer = () => {
       </Paper>
 
       {showGraph && total > 0.001 && (
-        <GraphComponent dosages={dosages}/>
+        <span style={{ userSelect: 'none' }}>
+          <GraphComponent dosages={dosages}/>
+        </span>
       )}
 
       {filteredDosages.map(dosage => (
