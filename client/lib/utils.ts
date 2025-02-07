@@ -19,7 +19,7 @@ export const calculateTimeVals = (amount: number, timestamp: number) => {
   let currentTimestamp = startTime;
   while(times < 10000) {
     currentTimestamp += 60 * 1000;
-    const currentAmount = calculateReducedValue(amount, currentTimestamp - startTime);
+    const currentAmount = calculateReducedValue(amount, currentTimestamp - timestamp);
     if (currentAmount < 0.001) times = Number.MAX_VALUE;
     else times++;
 

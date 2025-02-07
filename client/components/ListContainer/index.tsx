@@ -42,7 +42,7 @@ const ListContainer = () => {
   );
 };
 
-const calculateTimeVals = (dosages: Dosage[]) => {
+const calculateCombinedTimeVals = (dosages: Dosage[]): ZippedDosage[] => {
   const timeValObj: { [timestamp: number]: ZippedDosage } = {};
 
   for (let dosage of dosages) {
@@ -54,23 +54,13 @@ const calculateTimeVals = (dosages: Dosage[]) => {
       }
 
       currTimeValue[`amount-${dosage.id}`] = timeVal.amount;
+      currTimeValue['amount-total'] += timeVal.amount;
     }
   }
 
   const series = Object.values(timeValObj).sort((a, b) => a.timestamp - b.timestamp);
 
-  series.forEach(timeVal => {
-    const amounts = Object.keys(timeVal).filter(k => k !== 'timestamp' && k !== 'amount-total');
-    let total = 0;
-
-    for (let amount of amounts) {
-      total += (timeVal[amount] || 0);
-    }
-
-    timeVal['amount-total'] = total;
-  });
-
-  console.log(series);
+  console.log('combined time vals', series);
   return series;
 };
 

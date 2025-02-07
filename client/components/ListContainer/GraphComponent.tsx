@@ -15,23 +15,6 @@ const GraphComponent = ({ dosages }: Props) => {
   const amounts = Object.keys(zipped[0]).filter(k => k !== 'timestamp' && k !== 'amount-total');
   const [xMax, xMin, yMax, yMin] = getGraphEdges(zipped, amounts);
 
-  const series: MakeOptional<LineSeriesType, 'type'>[] = [
-    {
-      color: '#121212',
-      dataKey: 'amount-total',
-      showMark: false,
-      valueFormatter: v => 'Total: ' + v?.toFixed(yMax > 4 ? 1 : 3),
-    },
-    ...amounts.map(amountId => ({
-      area: true,
-      dataKey: amountId,
-      showMark: false,
-      stack: 'timestamp',
-      stackOrder: 'reverse' as StackOrderType,
-      valueFormatter: v => v?.toFixed(yMax > 4 ? 1 : 3),
-    })),
-  ];
-
   if (yMax > 4) {
     zipped.map(zip => amounts.forEach(amount => {
       if (zip[amount] < 0.1) delete zip[amount];
@@ -49,11 +32,28 @@ const GraphComponent = ({ dosages }: Props) => {
         valueFormatter: value => dayjs(value).format('hh:mma'),
       }]}
       yAxis={[{ max: yMax, min: yMin }]}
-      series={series}
+      series={getSeries(amounts, yMax)}
       height={300}
     />
   );
 };
+
+const getSeries = (amounts: string[], yMax: number): MakeOptional<LineSeriesType, 'type'>[] => [
+  {
+    color: '#121212',
+    dataKey: 'amount-total',
+    showMark: false,
+    valueFormatter: v => 'Total: ' + v?.toFixed(yMax > 4 ? 1 : 3),
+  },
+  ...amounts.map(amountId => ({
+    area: true,
+    dataKey: amountId,
+    showMark: false,
+    stack: 'timestamp',
+    stackOrder: 'reverse' as StackOrderType,
+    valueFormatter: v => v?.toFixed(yMax > 4 ? 1 : 3),
+  })),
+]
 
 const getGraphEdges = (zipped: ZippedDosage[], amounts: string[]) => {
   const yMax = amounts.reduce((p, c) => zipped[0][c] + p, 0);
@@ -89,19 +89,9 @@ const zipTogetherTimeValues = (dosages: Dosage[], now=Date.now()) => {
       }
 
       combined[`amount-${dosage.id}`] = currTimeValue.amount;
+      combined['amount-total'] += currTimeValue.amount;
     }
   }
-
-  combinedTimeVals.forEach(timeVal => {
-    const amounts = Object.keys(timeVal).filter(k => k !== 'timestamp' && k !== 'amount-total');
-    let total = 0;
-
-    for (let amount of amounts) {
-      total += (timeVal[amount] || 0);
-    }
-
-    timeVal['amount-total'] = total;
-  });
 
   return combinedTimeVals;
 };
