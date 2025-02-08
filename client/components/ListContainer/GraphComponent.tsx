@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material';
+import { Typography, useTheme } from '@mui/material';
 import { LineSeriesType, StackOrderType } from '@mui/x-charts';
 import { MakeOptional } from '@mui/x-charts/internals';
 import { LineChart } from '@mui/x-charts/LineChart';
@@ -13,6 +13,7 @@ type Props = {
 };
 
 const GraphComponent = ({ dosages }: Props) => {
+  const theme = useTheme();
   const combinedTimeValObj = calculateCombinedTimeVals(dosages);
   const nowMinute = getNowMinute();
 
@@ -41,21 +42,25 @@ const GraphComponent = ({ dosages }: Props) => {
         valueFormatter: value => dayjs(value).format('hh:mma'),
       }]}
       yAxis={[{ max: yMax, min: yMin }]}
-      series={getSeries(amounts, yMax)}
+      series={getSeries(amounts, yMax, dosages.length, theme.palette.primary.main, theme.palette.secondary.main)}
       height={300}
     />
   );
 };
 
-const getSeries = (amounts: string[], yMax: number): MakeOptional<LineSeriesType, 'type'>[] => [
+const getSeries = (amounts: string[], yMax: number, length: number, primaryColor: string,
+                   secondaryColor: string): MakeOptional<LineSeriesType, 'type'>[] => [
   {
     color: '#121212',
     dataKey: 'amount-total',
     showMark: false,
     valueFormatter: v => 'Total: ' + v?.toFixed(yMax > 4 ? 1 : 3),
   },
-  ...amounts.map(amountId => ({
+  ...amounts.map((amountId, i) => ({
     area: true,
+    color: length % 2 === 0
+      ? (i % 2 === 0 ? primaryColor : secondaryColor)
+      : (i % 2 === 0 ? secondaryColor : primaryColor),
     dataKey: amountId,
     showMark: false,
     stack: 'timestamp',
