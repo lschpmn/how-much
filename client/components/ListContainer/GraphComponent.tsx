@@ -3,7 +3,7 @@ import { LineSeriesType, StackOrderType } from '@mui/x-charts';
 import { MakeOptional } from '@mui/x-charts/internals';
 import { LineChart } from '@mui/x-charts/LineChart';
 import dayjs from 'dayjs';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Dosage } from '../../../types';
 import { getNowMinute } from '../../lib/utils';
 import { CombinedDosage } from '../../types';
@@ -14,13 +14,23 @@ type Props = {
 
 const GraphComponent = ({ dosages }: Props) => {
   const theme = useTheme();
-  const combinedTimeValObj = calculateCombinedTimeVals(dosages);
   const nowMinute = getNowMinute();
 
-  if (!combinedTimeValObj[nowMinute])
-    return <Typography color="textPrimary" style={{ textAlign: 'center' }} variant="h3">No Remaining Amount</Typography>;
+  const [combinedTimeValObj, combinedTimeVals] = useMemo(() => {
+    const combinedTimeValObj = calculateCombinedTimeVals(dosages);
+    const combinedTimeVals = Object.values(combinedTimeValObj).sort((a, b) => a.timestamp - b.timestamp);
 
-  const combinedTimeVals = Object.values(combinedTimeValObj).sort((a, b) => a.timestamp - b.timestamp);
+    return [combinedTimeValObj, combinedTimeVals];
+  }, [dosages.length]);
+
+  if (!combinedTimeValObj[nowMinute]) {
+    return (
+      <Typography color="textPrimary" style={{ textAlign: 'center' }} variant="h3">
+        No Remaining Amount
+      </Typography>
+    );
+  }
+
   const nowTimeVal = combinedTimeValObj[nowMinute];
   const amounts = Object.keys(nowTimeVal).filter(k => k !== 'timestamp' && k !== 'amount-total');
   const [xMax, xMin, yMax, yMin] = getGraphEdges(combinedTimeVals.filter(d => d.timestamp >= nowMinute), amounts);
