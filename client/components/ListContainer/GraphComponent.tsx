@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import React, { useMemo } from 'react';
 import { Dosage } from '../../../types';
 import { getNowMinute } from '../../lib/utils';
-import { CombinedDosage } from '../../types';
+import { CombinedDosage, CombinedDosagesObj } from '../../types';
 
 type Props = {
   dosages: Dosage[],
@@ -33,7 +33,7 @@ const GraphComponent = ({ dosages }: Props) => {
 
   const nowTimeVal = combinedTimeValObj[nowMinute];
   const amounts = Object.keys(nowTimeVal).filter(k => k !== 'timestamp' && k !== 'amount-total');
-  const [xMax, xMin, yMax, yMin] = getGraphEdges(combinedTimeVals.filter(d => d.timestamp >= nowMinute), amounts);
+  const [xMax, xMin, yMax, yMin] = getGraphEdges(combinedTimeVals.filter(d => d.timestamp >= nowMinute));
 
   return (
     <LineChart
@@ -70,27 +70,27 @@ const getSeries = (amounts: string[], bigMode: boolean, length: number,
     stack: 'timestamp',
     stackOrder: 'reverse' as StackOrderType,
     valueFormatter: v => bigMode
-      ? v > 0.1 ? v?.toFixed(1) : null
+      ? v >= 0.5 ? v?.toFixed(1) : null
       : v?.toFixed(3),
   })),
 ];
 
-const getGraphEdges = (combinedTimeVals: CombinedDosage[], amounts: string[]) => {
-  const yMax = amounts.reduce((p, c) => combinedTimeVals[0][c] + p, 0);
+const getGraphEdges = (combinedTimeVals: CombinedDosage[]) => {
+  const yMax = combinedTimeVals[0]['amount-total'];
   const yMin = yMax > 4 ? 1 : 0.001;
   const xMin = combinedTimeVals[0].timestamp;
 
-  const minIndex = yMax > 4
-    ? combinedTimeVals.findIndex(zip => amounts.reduce((p, c) => (zip[c] || 0) + p, 0) < 1)
+  const maxIndex = yMax > 4
+    ? combinedTimeVals.findIndex(zip => zip['amount-total'] <= 1)
     : combinedTimeVals.length - 1;
 
-  const xMax = combinedTimeVals[minIndex].timestamp;
+  const xMax = combinedTimeVals[maxIndex].timestamp;
 
   return [xMax, xMin, yMax, yMin];
 };
 
-const calculateCombinedTimeVals = (dosages: Dosage[]): { [timestamp: number]: CombinedDosage } => {
-  const timeValObj: { [timestamp: number]: CombinedDosage } = {};
+const calculateCombinedTimeVals = (dosages: Dosage[]): CombinedDosagesObj => {
+  const timeValObj: CombinedDosagesObj = {};
 
   for (let dosage of dosages) {
     for (let timeVal of dosage.timeValues) {

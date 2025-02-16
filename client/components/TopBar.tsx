@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { State } from '../types';
 
 const TopBar = () => {
-  const dosages = useSelector((state: State) => state.dosages.map(d => d.currentAmount));
+  const dosages = useSelector((state: State) => state.dosages.dosages.map(d => d.currentAmount));
 
   const total = dosages.reduce((t, c) => t + c, 0);
 

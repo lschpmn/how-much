@@ -8,9 +8,9 @@ import DosageItem from './DosageItem';
 import GraphComponent from './GraphComponent';
 
 const ListContainer = () => {
-  const [showAll, setShowAll] = useSearchParamBooleanValue('active');
-  const [showGraph, setShowGraph] = useSearchParamBooleanValue('graph');
-  const dosages: Dosage[] = useSelector((state: State) => state.dosages, isEqual);
+  const [showAll, setShowAll] = useSearchParamBooleanValue('showAll');
+  const [showGraph, setShowGraph] = useSearchParamBooleanValue('showGraph');
+  const dosages: Dosage[] = useSelector((state: State) => state.dosages.dosages, isEqual);
   const filteredDosages = dosages.filter(d => showAll || d.currentAmount > 0.5).slice(0, 100);
 
   return (

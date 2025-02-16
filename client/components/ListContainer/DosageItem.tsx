@@ -11,7 +11,7 @@ import { State } from '../../types';
 
 const DosageItem = ({ id }: { id: string }) => {
   const [showDeleteIcon, setShowDeleteIcon] = useState(true);
-  const dosage: Dosage = useSelector((state: State) => state.dosages.find(d => d.id === id), isEqual);
+  const dosage: Dosage = useSelector((state: State) => state.dosages.dosages.find(d => d.id === id), isEqual);
   const deleteDosageAction = useAction(deleteDosageSendServer);
 
   return (

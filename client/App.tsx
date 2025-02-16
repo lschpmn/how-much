@@ -12,21 +12,13 @@ const App = () => {
 
   useEffect(() => {
     // restart needed to fix MUI Charts memory leak
-    let timerId: NodeJS.Timeout;
-    const restartTimer = throttle(() => {
-      if (timerId) clearTimeout(timerId);
-      timerId = setTimeout(() => window.location.reload(), 2 * 60 * 60 * 1000);
-    }, 15 * 1000);
-
-    window.addEventListener('mousemove', restartTimer);
-    window.addEventListener('touchstart', restartTimer);
-
+    // @ts-ignore
+    let timerId = setTimeout(() => window.location.reload(true), 60 * 60 * 1000);
     const intervalId = setInterval(updateDosageAmountsAction, 15 * 1000);
 
     return () => {
       clearInterval(intervalId);
-      window.removeEventListener('mousemove', restartTimer);
-      window.removeEventListener('touchstart', restartTimer);
+      clearTimeout(timerId);
     }
   }, []);
 

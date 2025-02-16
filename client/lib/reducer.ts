@@ -1,35 +1,39 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Action, Dosage } from '../../types';
+import { DosageState } from '../types';
 import { calculateReducedValue, calculateTimeVals } from './utils';
 
-const MAXIMUM_TIME = 6 * 60 * 60 * 1000;
+const MAXIMUM_TIME = 9 * 60 * 60 * 1000;
 
 const dosagesSlice = createSlice({
   name: 'dosages',
-  initialState: [] as Dosage[],
+  initialState: {
+    dosages: [],
+    combinedDosagesObj: {},
+  } as DosageState,
   reducers: {
     addDosageSendServer: (state, action: Action<Dosage>) => {
       const dosage = action.payload;
       setCurrentAmount(Date.now())(dosage);
       setTimeValues(dosage);
-      state.push(dosage);
-      state.sort((a, b) => b.timestamp - a.timestamp);
+      state.dosages.push(dosage);
+      state.dosages.sort((a, b) => b.timestamp - a.timestamp);
     },
     deleteDosageSendServer: (state, action: Action<string>) => {
       const id = action.payload;
-      return state.filter(d => d.id !== id);
+      state.dosages = state.dosages.filter(d => d.id !== id);
     },
     setDosages: (state, action: Action<Dosage[]>) => {
-      const newState = action.payload;
+      const newDosages = action.payload;
       const now = Date.now();
-      newState.forEach(setCurrentAmount(now));
-      newState.forEach(setTimeValues);
+      newDosages.forEach(setCurrentAmount(now));
+      newDosages.forEach(setTimeValues);
 
-      return newState;
+      state.dosages = newDosages;
     },
     updateDosageAmounts: (state, action: Action<null>) => {
       const now = Date.now();
-      state.forEach(setCurrentAmount(now));
+      state.dosages.forEach(setCurrentAmount(now));
     },
   },
 });
