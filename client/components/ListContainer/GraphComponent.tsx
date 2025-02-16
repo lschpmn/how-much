@@ -26,7 +26,7 @@ const GraphComponent = ({ dosages }: Props) => {
   if (!combinedTimeValObj[nowMinute]) {
     return (
       <Typography color="textPrimary" style={{ textAlign: 'center' }} variant="h3">
-        No Remaining Amount
+        {dosages.length === 0 ? 'LOADING' : 'No Remaining Amount'}
       </Typography>
     );
   }
@@ -34,12 +34,6 @@ const GraphComponent = ({ dosages }: Props) => {
   const nowTimeVal = combinedTimeValObj[nowMinute];
   const amounts = Object.keys(nowTimeVal).filter(k => k !== 'timestamp' && k !== 'amount-total');
   const [xMax, xMin, yMax, yMin] = getGraphEdges(combinedTimeVals.filter(d => d.timestamp >= nowMinute), amounts);
-
-  if (yMax > 4) {
-    combinedTimeVals.map(combinedTimeVal => amounts.forEach(amount => {
-      if (combinedTimeVal[amount] < 0.1) delete combinedTimeVal[amount];
-    }));
-  }
 
   return (
     <LineChart
@@ -75,7 +69,9 @@ const getSeries = (amounts: string[], yMax: number, length: number, primaryColor
     showMark: false,
     stack: 'timestamp',
     stackOrder: 'reverse' as StackOrderType,
-    valueFormatter: v => v?.toFixed(yMax > 4 ? 1 : 3),
+    valueFormatter: v => yMax > 4
+      ? v > 0.1 ? v?.toFixed(1) : null
+      : v?.toFixed(3),
   })),
 ];
 

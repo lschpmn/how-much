@@ -8,8 +8,8 @@ import DosageItem from './DosageItem';
 import GraphComponent from './GraphComponent';
 
 const ListContainer = () => {
-  const [showAll, setShowAll] = useState(false);
-  const [showGraph, setShowGraph] = useState(false);
+  const [showAll, setShowAll] = useSearchParamBooleanValue('active');
+  const [showGraph, setShowGraph] = useSearchParamBooleanValue('graph');
   const dosages: Dosage[] = useSelector((state: State) => state.dosages, isEqual);
   const filteredDosages = dosages.filter(d => showAll || d.currentAmount > 0.5).slice(0, 100);
 
@@ -38,5 +38,18 @@ const ListContainer = () => {
 const StyleButton = styled(Button)`
     margin: 0.5rem;
 `;
+
+const useSearchParamBooleanValue = (value: string): [boolean, (shouldShow: boolean) => void] => {
+  const url = new URL(window.location.toString());
+  const theValue = url.searchParams.get(value) === 'true';
+  const [v, f] = useState(theValue);
+  const setValue = (shouldShow: boolean) => {
+    url.searchParams.set(value, shouldShow.toString());
+    history.replaceState(null, '', url);
+    f(!v); // just to kick the rerender
+  };
+
+  return [theValue, setValue];
+};
 
 export default ListContainer;
