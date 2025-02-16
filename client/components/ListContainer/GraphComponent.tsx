@@ -1,4 +1,4 @@
-import { Typography, useTheme } from '@mui/material';
+import { Palette, Typography, useTheme } from '@mui/material';
 import { LineSeriesType, StackOrderType } from '@mui/x-charts';
 import { MakeOptional } from '@mui/x-charts/internals';
 import { LineChart } from '@mui/x-charts/LineChart';
@@ -46,30 +46,30 @@ const GraphComponent = ({ dosages }: Props) => {
         valueFormatter: value => dayjs(value).format('hh:mma'),
       }]}
       yAxis={[{ max: yMax, min: yMin }]}
-      series={getSeries(amounts, yMax, dosages.length, theme.palette.primary.main, theme.palette.secondary.main)}
+      series={getSeries(amounts, yMax > 4, dosages.length, theme.palette)}
       height={300}
     />
   );
 };
 
-const getSeries = (amounts: string[], yMax: number, length: number, primaryColor: string,
-                   secondaryColor: string): MakeOptional<LineSeriesType, 'type'>[] => [
+const getSeries = (amounts: string[], bigMode: boolean, length: number,
+                   palette: Palette): MakeOptional<LineSeriesType, 'type'>[] => [
   {
     color: '#121212',
     dataKey: 'amount-total',
     showMark: false,
-    valueFormatter: v => 'Total: ' + v?.toFixed(yMax > 4 ? 1 : 3),
+    valueFormatter: v => 'Total: ' + v?.toFixed(bigMode ? 1 : 3),
   },
   ...amounts.map((amountId, i) => ({
     area: true,
     color: length % 2 === 0
-      ? (i % 2 === 0 ? primaryColor : secondaryColor)
-      : (i % 2 === 0 ? secondaryColor : primaryColor),
+      ? (i % 2 === 0 ? palette.primary.main : palette.secondary.main)
+      : (i % 2 === 0 ? palette.secondary.main : palette.primary.main),
     dataKey: amountId,
     showMark: false,
     stack: 'timestamp',
     stackOrder: 'reverse' as StackOrderType,
-    valueFormatter: v => yMax > 4
+    valueFormatter: v => bigMode
       ? v > 0.1 ? v?.toFixed(1) : null
       : v?.toFixed(3),
   })),
