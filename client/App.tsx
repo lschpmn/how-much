@@ -1,5 +1,4 @@
 import { styled } from '@mui/material';
-import { throttle } from 'lodash';
 import React, { useEffect } from 'react';
 import AddButton from './components/AddButton';
 import ListContainer from './components/ListContainer';
@@ -12,8 +11,10 @@ const App = () => {
 
   useEffect(() => {
     // restart needed to fix MUI Charts memory leak
-    // @ts-ignore
-    let timerId = setTimeout(() => window.location.reload(true), 60 * 60 * 1000);
+    let timerId = setTimeout(() => {
+      const currentUrl: URL = new URL(window.location.toString());
+      window.location.assign(`http://${currentUrl.hostname}:${+currentUrl.port - 1}/${currentUrl.search}`);
+    }, 30 * 60 * 1000);
     const intervalId = setInterval(updateDosageAmountsAction, 15 * 1000);
 
     return () => {
