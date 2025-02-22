@@ -10,9 +10,10 @@ import { CombinedDosage, CombinedDosagesObj } from '../../types';
 
 type Props = {
   dosages: Dosage[],
+  showAll: boolean,
 };
 
-const GraphComponent = ({ dosages }: Props) => {
+const GraphComponent = ({ dosages, showAll }: Props) => {
   const theme = useTheme();
   const nowMinute = getNowMinute();
 
@@ -33,7 +34,7 @@ const GraphComponent = ({ dosages }: Props) => {
 
   const nowTimeVal = combinedTimeValObj[nowMinute];
   const amounts = Object.keys(nowTimeVal).filter(k => k !== 'timestamp' && k !== 'amount-total');
-  const [xMax, xMin, yMax, yMin] = getGraphEdges(combinedTimeVals.filter(d => d.timestamp >= nowMinute));
+  const [xMax, xMin, yMax, yMin] = getGraphEdges(combinedTimeVals.filter(d => d.timestamp >= nowMinute), showAll);
 
   return (
     <LineChart
@@ -46,7 +47,7 @@ const GraphComponent = ({ dosages }: Props) => {
         valueFormatter: value => dayjs(value).format('hh:mma'),
       }]}
       yAxis={[{ max: yMax, min: yMin }]}
-      series={getSeries(amounts, yMax > 4, dosages.length, theme.palette)}
+      series={getSeries(amounts, yMax > 4 && !showAll, dosages.length, theme.palette)}
       height={300}
     />
   );
@@ -75,12 +76,12 @@ const getSeries = (amounts: string[], bigMode: boolean, length: number,
   })),
 ];
 
-const getGraphEdges = (combinedTimeVals: CombinedDosage[]) => {
+const getGraphEdges = (combinedTimeVals: CombinedDosage[], showAll: boolean) => {
   const yMax = combinedTimeVals[0]['amount-total'];
-  const yMin = yMax > 4 ? 1 : 0.001;
+  const yMin = yMax > 4 && !showAll ? 1 : 0.001;
   const xMin = combinedTimeVals[0].timestamp;
 
-  const maxIndex = yMax > 4
+  const maxIndex = yMax > 4 && !showAll
     ? combinedTimeVals.findIndex(zip => zip['amount-total'] <= 1)
     : combinedTimeVals.length - 1;
 

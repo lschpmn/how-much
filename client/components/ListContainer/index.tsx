@@ -25,7 +25,7 @@ const ListContainer = () => {
       </Paper>
 
       {showGraph && (
-        <span style={{ userSelect: 'none' }}><GraphComponent dosages={dosages}/></span>
+        <span style={{ userSelect: 'none' }}><GraphComponent dosages={dosages} showAll={showAll}/></span>
       )}
 
       {filteredDosages.map(dosage => (
