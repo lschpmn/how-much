@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Action, Dosage } from '../../types';
-import { DosageState } from '../types';
-import { calculateReducedValue, calculateTimeVals } from './utils';
+import { CombinedDosagesObj, DosageState } from '../types';
+import { calculateReducedValue, calculateTimeVals, HALF_LIFE } from './utils';
 
 const MAXIMUM_TIME = 9 * 60 * 60 * 1000;
 
@@ -30,6 +30,7 @@ const dosagesSlice = createSlice({
       newDosages.forEach(setTimeValues);
 
       state.dosages = newDosages;
+      state.combinedDosagesObj = getCombinedDosagesObj(newDosages, HALF_LIFE);
     },
     updateDosageAmounts: (state, action: Action<null>) => {
       const now = Date.now();
@@ -52,6 +53,42 @@ const setCurrentAmount = (now: number) => (dosage: Dosage) => {
     return;
   }
 
-  let val = calculateReducedValue(dosage.amount, now - dosage.timestamp);
+  let val = calculateReducedValue(dosage.amount, now - dosage.timestamp, HALF_LIFE);
   dosage.currentAmount = Math.min(val, dosage.amount);
 };
+
+function getCombinedDosagesObj(dosages: Dosage[], halfLife: number): CombinedDosagesObj {
+  const combinedDosagesObj: CombinedDosagesObj = {};
+
+  for (let dosage of dosages) {
+    const startTime = Date.now() - halfLife * 20;
+    if (dosage.timestamp < startTime) continue
+
+    addDosageToCombinedDosagesObj(dosage, combinedDosagesObj, halfLife);
+  }
+
+  return combinedDosagesObj;
+}
+
+function addDosageToCombinedDosagesObj(dosage: Dosage, combinedDosagesObj: CombinedDosagesObj, halfLife: number) {
+  let timestamp = dosage.timestamp - (dosage.timestamp % 60000);
+  let times = 0
+
+  while (times < 100000) {
+    times++;
+
+    const amount = calculateReducedValue(dosage.amount, Math.max(timestamp - dosage.timestamp, 0), halfLife);
+    let combinedDosage = combinedDosagesObj[timestamp];
+    if (!combinedDosage) combinedDosagesObj[timestamp] = combinedDosage = { timestamp, 'amount-total': 0 };
+
+    combinedDosage[`amount-${dosage.id}`] = amount;
+    combinedDosage['amount-total'] += amount;
+
+    if (amount < 0.001) times = Number.MAX_VALUE;
+    else timestamp += 5000;
+  }
+}
+
+function removeDosageFromCombinedDosagesObj(id: string, combinedDosagesObj: CombinedDosagesObj) {
+
+}

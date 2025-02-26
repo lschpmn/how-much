@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
-const HALF_LIFE = 30 * 60 * 1000;
+export const HALF_LIFE = 30 * 60 * 1000;
 const TARGET_RATIO = 0.5;
 
-export const calculateReducedValue = (startingAmount: number, timeElapsed: number) =>
-  startingAmount * Math.pow(0.5, timeElapsed / HALF_LIFE);
+export const calculateReducedValue = (startingAmount: number, timeElapsed: number, halfLife: number) =>
+  startingAmount * Math.pow(0.5, timeElapsed / halfLife);
 
 export const calculateTimeVals = (amount: number, timestamp: number) => {
   const startTime = timestamp - (timestamp % 60000);
@@ -19,7 +19,7 @@ export const calculateTimeVals = (amount: number, timestamp: number) => {
   let currentTimestamp = startTime;
   while(times < 10000) {
     currentTimestamp += 60 * 1000;
-    const currentAmount = calculateReducedValue(amount, currentTimestamp - timestamp);
+    const currentAmount = calculateReducedValue(amount, currentTimestamp - timestamp, HALF_LIFE);
     if (currentAmount < 0.001) times = Number.MAX_VALUE;
     else times++;
 
