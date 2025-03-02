@@ -10,13 +10,8 @@ export type DbSchema = {
 
 export type Dosage = {
   amount: number,
-  currentAmount?: number,
   id: string,
   timestamp: number,
-  timeValues?: {
-    amount: number,
-    timestamp: number,
-  }[],
 };
 
 export type EmitAction = (action: Action<any>, reason?: string) => void

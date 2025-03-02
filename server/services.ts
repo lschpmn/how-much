@@ -7,8 +7,6 @@ const methods = {} as SocketFunctions;
 
 methods[addDosageSendServer.toString()] = (emit, emitAll) => (dosage: Dosage) => {
   log(`Dosage:${dosage.amount}`);
-  delete dosage.currentAmount;
-  delete dosage.timeValues;
   db.addDosage(dosage);
   emitAll(setDosages(db.getDosages()));
 };

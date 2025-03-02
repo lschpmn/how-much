@@ -3,10 +3,12 @@ import { LineSeriesType, StackOrderType } from '@mui/x-charts';
 import { MakeOptional } from '@mui/x-charts/internals';
 import { LineChart } from '@mui/x-charts/LineChart';
 import dayjs from 'dayjs';
+import { isEqual } from 'lodash';
 import React, { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { Dosage } from '../../../types';
 import { getNowMinute } from '../../lib/utils';
-import { CombinedDosage, CombinedDosagesObj } from '../../types';
+import { CombinedDosage, CombinedDosagesObj, State } from '../../types';
 
 type Props = {
   dosages: Dosage[],
@@ -14,17 +16,17 @@ type Props = {
 };
 
 const GraphComponent = ({ dosages, showAll }: Props) => {
+  const combinedDosagesObj: CombinedDosagesObj = useSelector((state: State) => state.dosages.combinedDosagesObj, isEqual);
   const theme = useTheme();
   const nowMinute = getNowMinute();
 
-  const [combinedTimeValObj, combinedTimeVals] = useMemo(() => {
-    const combinedTimeValObj = calculateCombinedTimeVals(dosages);
-    const combinedTimeVals = Object.values(combinedTimeValObj).sort((a, b) => a.timestamp - b.timestamp);
-
-    return [combinedTimeValObj, combinedTimeVals];
+  const combinedDosages = useMemo(() => {
+    return Object.values(combinedDosagesObj)
+      .filter(dosage => dosage.timestamp % 60000 === 0)
+      .sort((a, b) => a.timestamp - b.timestamp);
   }, [dosages.length]);
 
-  if (!combinedTimeValObj[nowMinute]) {
+  if (!combinedDosagesObj[nowMinute]) {
     return (
       <Typography color="textPrimary" style={{ textAlign: 'center' }} variant="h3">
         {dosages.length === 0 ? 'LOADING' : 'No Remaining Amount'}
@@ -32,14 +34,13 @@ const GraphComponent = ({ dosages, showAll }: Props) => {
     );
   }
 
-  const nowTimeVal = combinedTimeValObj[nowMinute];
-  const amounts = Object.keys(nowTimeVal).filter(k => k !== 'timestamp' && k !== 'amount-total');
-  const [xMax, xMin, yMax, yMin] = getGraphEdges(combinedTimeVals.filter(d => d.timestamp >= nowMinute), showAll);
+  const amounts = Object.keys(combinedDosagesObj[nowMinute]).filter(k => k !== 'timestamp' && k !== 'amount-total');
+  const [xMax, xMin, yMax, yMin] = getGraphEdges(combinedDosages.filter(d => d.timestamp >= nowMinute), showAll);
 
   return (
     <LineChart
       grid={{ horizontal: true, vertical: true }}
-      dataset={combinedTimeVals}
+      dataset={combinedDosages}
       xAxis={[{
         dataKey: 'timestamp',
         max: xMax,
@@ -76,37 +77,18 @@ const getSeries = (amounts: string[], bigMode: boolean, length: number,
   })),
 ];
 
-const getGraphEdges = (combinedTimeVals: CombinedDosage[], showAll: boolean) => {
-  const yMax = combinedTimeVals[0]['amount-total'];
-  const yMin = yMax > 4 && !showAll ? 1 : 0.001;
-  const xMin = combinedTimeVals[0].timestamp;
+const getGraphEdges = (combinedDosages: CombinedDosage[], showAll: boolean) => {
+  const yMax = combinedDosages[0]['amount-total'];
+  const yMin = yMax > 4 && !showAll ? 1 : 0.01;
+  const xMin = combinedDosages[0].timestamp;
 
   const maxIndex = yMax > 4 && !showAll
-    ? combinedTimeVals.findIndex(zip => zip['amount-total'] <= 1)
-    : combinedTimeVals.length - 1;
+    ? combinedDosages.findIndex(zip => zip['amount-total'] <= 1)
+    : combinedDosages.length - 1;
 
-  const xMax = combinedTimeVals[maxIndex].timestamp;
+  const xMax = combinedDosages[maxIndex].timestamp;
 
   return [xMax, xMin, yMax, yMin];
-};
-
-const calculateCombinedTimeVals = (dosages: Dosage[]): CombinedDosagesObj => {
-  const timeValObj: CombinedDosagesObj = {};
-
-  for (let dosage of dosages) {
-    for (let timeVal of dosage.timeValues) {
-      let currTimeValue = timeValObj[timeVal.timestamp];
-      if (!currTimeValue) {
-        currTimeValue = { 'amount-total': 0, timestamp: timeVal.timestamp };
-        timeValObj[timeVal.timestamp] = currTimeValue;
-      }
-
-      currTimeValue[`amount-${dosage.id}`] = timeVal.amount;
-      currTimeValue['amount-total'] += timeVal.amount;
-    }
-  }
-
-  return timeValObj;
 };
 
 export default GraphComponent;

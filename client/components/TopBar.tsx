@@ -1,12 +1,17 @@
 import { AppBar, Toolbar, Typography } from '@mui/material';
+import { isEqual } from 'lodash';
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { State } from '../types';
+import { CombinedDosagesObj, State } from '../types';
 
-const TopBar = () => {
-  const dosages = useSelector((state: State) => state.dosages.dosages.map(d => d.currentAmount));
+type Props = {
+  now: number,
+};
 
-  const total = dosages.reduce((t, c) => t + c, 0);
+const TopBar = ({ now }: Props) => {
+  const combinedDosagesObj: CombinedDosagesObj = useSelector((state: State) => state.dosages.combinedDosagesObj, isEqual);
+
+  const total = combinedDosagesObj[now]?.[`amount-total`] || 0;
 
   return (
     <AppBar>

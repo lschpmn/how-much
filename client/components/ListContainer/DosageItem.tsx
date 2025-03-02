@@ -9,9 +9,15 @@ import { deleteDosageSendServer } from '../../lib/reducer';
 import { constructRemainingStr, useAction } from '../../lib/utils';
 import { State } from '../../types';
 
-const DosageItem = ({ id }: { id: string }) => {
-  const [showDeleteIcon, setShowDeleteIcon] = useState(true);
+type Props = {
+  id: string,
+  now: number,
+};
+
+const DosageItem = ({ id, now }: Props) => {
+  const currentAmount = useSelector((state: State) => state.dosages.combinedDosagesObj[now]?.[`amount-${id}`] || 0, isEqual);
   const dosage: Dosage = useSelector((state: State) => state.dosages.dosages.find(d => d.id === id), isEqual);
+  const [showDeleteIcon, setShowDeleteIcon] = useState(true);
   const deleteDosageAction = useAction(deleteDosageSendServer);
 
   return (
@@ -26,7 +32,7 @@ const DosageItem = ({ id }: { id: string }) => {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography>{Math.round(dosage.currentAmount)} / {dosage.amount}</Typography>
+        <Typography>{Math.round(currentAmount)} / {dosage.amount}</Typography>
 
         {showDeleteIcon ? (
           <IconButton onClick={() => setShowDeleteIcon(false)}>
@@ -43,9 +49,9 @@ const DosageItem = ({ id }: { id: string }) => {
       </div>
       <Typography style={{ padding: '0.5rem 0 1rem 0' }}>
         {dayjs(dosage.timestamp).format('h:mm A')}
-        {dosage.currentAmount > 0.5 && ' - ' + constructRemainingStr(dosage.currentAmount)}
+        {currentAmount > 0.5 && ' - ' + constructRemainingStr(currentAmount)}
       </Typography>
-      <LinearProgress variant="determinate" value={(dosage.currentAmount / dosage.amount) * 100}/>
+      <LinearProgress variant="determinate" value={(currentAmount / dosage.amount) * 100}/>
     </Paper>
   );
 };

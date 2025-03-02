@@ -3,24 +3,29 @@ import { isEqual } from 'lodash';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Dosage } from '../../../types';
-import { State } from '../../types';
+import { CombinedDosagesObj, State } from '../../types';
 import DosageItem from './DosageItem';
 import GraphComponent from './GraphComponent';
 
-const ListContainer = () => {
-  const [showAll, setShowAll] = useSearchParamBooleanValue('showAll');
-  const [showGraph, setShowGraph] = useSearchParamBooleanValue('showGraph');
+type Props = {
+  now: number,
+};
+
+const ListContainer = ({ now }: Props) => {
   const dosages: Dosage[] = useSelector((state: State) => state.dosages.dosages, isEqual);
-  const filteredDosages = dosages.filter(d => showAll || d.currentAmount > 0.5).slice(0, 100);
+  const combinedDosagesObj: CombinedDosagesObj = useSelector((state: State) => state.dosages.combinedDosagesObj, isEqual);
+  const [showGraph, setShowGraph] = useSearchParamBooleanValue('showGraph');
+  const [showAll, setShowAll] = useSearchParamBooleanValue('showAll');
+  const filteredDosages = dosages.filter(d => showAll || combinedDosagesObj[now]?.[`amount-${d.id}`] > 0.5).slice(0, 100);
 
   return (
     <div style={{ margin: '3.5rem 0 2rem 0' }}>
       <Paper style={{ margin: '2rem', padding: '1.5rem' }} variant="outlined">
-        <StyleButton color="inherit" onClick={() => setShowAll(!showAll)} variant="outlined">
-          {showAll ? 'Showing All' : 'Showing Active'}
-        </StyleButton>
         <StyleButton color="inherit" onClick={() => setShowGraph(!showGraph)} variant="outlined">
           {showGraph ? 'Showing Graph' : 'Hiding Graph'}
+        </StyleButton>
+        <StyleButton color="inherit" onClick={() => setShowAll(!showAll)} variant="outlined">
+          {showAll ? 'Showing All' : 'Showing Active'}
         </StyleButton>
       </Paper>
 
@@ -29,7 +34,7 @@ const ListContainer = () => {
       )}
 
       {filteredDosages.map(dosage => (
-        <DosageItem key={dosage.id} id={dosage.id}/>
+        <DosageItem key={dosage.id} id={dosage.id} now={now}/>
       ))}
     </div>
   );

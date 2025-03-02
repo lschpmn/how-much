@@ -3,11 +3,10 @@ import React, { useEffect } from 'react';
 import AddButton from './components/AddButton';
 import ListContainer from './components/ListContainer';
 import TopBar from './components/TopBar';
-import { updateDosageAmounts } from './lib/reducer';
-import { useAction } from './lib/utils';
+import { useNow } from './lib/utils';
 
 const App = () => {
-  const updateDosageAmountsAction = useAction(updateDosageAmounts);
+  const [now, updateNow] = useNow();
 
   useEffect(() => {
     // restart needed to fix MUI Charts memory leak
@@ -15,7 +14,8 @@ const App = () => {
       const currentUrl: URL = new URL(window.location.toString());
       window.location.assign(`http://${currentUrl.hostname}:${+currentUrl.port - 1}/${currentUrl.search}`);
     }, 30 * 60 * 1000);
-    const intervalId = setInterval(updateDosageAmountsAction, 15 * 1000);
+
+    const intervalId = setInterval(updateNow, 5 * 1000);
 
     return () => {
       clearInterval(intervalId);
@@ -25,11 +25,11 @@ const App = () => {
 
   return (
     <Container>
-      <TopBar/>
+      <TopBar now={now}/>
 
       <AddButton/>
 
-      <ListContainer/>
+      <ListContainer now={now}/>
     </Container>
   );
 };
