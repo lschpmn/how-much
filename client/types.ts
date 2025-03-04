@@ -1,8 +1,10 @@
-import { Dosage } from '../types';
+import { Dosage, TypeObj } from '../types';
 
 export type DosageState = {
-  dosages: Dosage[],
   combinedDosagesObj: CombinedDosagesObj,
+  currentTypeId: string,
+  dosages: Dosage[],
+  typeObj: TypeObj,
 };
 
 export type State = {

@@ -5,7 +5,7 @@ import { Server, Socket } from 'socket.io';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
-import { setDosages } from '../client/lib/reducer';
+import { initSet } from '../client/lib/reducer';
 import { Action, EmitAction } from '../types';
 import webpackConfig from '../webpack.config';
 import services from './services';
@@ -30,7 +30,7 @@ export const connectSocket = (server: ServerType) => {
       });
     }
 
-    emitAction(setDosages(db.getDosages()), 'Client Init');
+    emitAction(initSet([db.getDosages(), db.getTypes()]), 'Client Init');
 
     socket.on('disconnect', () => log('client disconnected'));
   });

@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { Dosage } from '../../../types';
 import { deleteDosageSendServer } from '../../lib/reducer';
 import { constructRemainingStr, useAction } from '../../lib/utils';
-import { State } from '../../types';
+import { CombinedDosagesObj, State } from '../../types';
 
 type Props = {
   id: string,
@@ -15,10 +15,11 @@ type Props = {
 };
 
 const DosageItem = ({ id, now }: Props) => {
-  const currentAmount = useSelector((state: State) => state.dosages.combinedDosagesObj[now]?.[`amount-${id}`] || 0, isEqual);
+  const combinedDosagesObj: CombinedDosagesObj = useSelector((state: State) => state.dosages.combinedDosagesObj, isEqual);
   const dosage: Dosage = useSelector((state: State) => state.dosages.dosages.find(d => d.id === id), isEqual);
   const [showDeleteIcon, setShowDeleteIcon] = useState(true);
   const deleteDosageAction = useAction(deleteDosageSendServer);
+  const currentAmount = combinedDosagesObj[now]?.[`amount-${id}`] || 0;
 
   return (
     <Paper

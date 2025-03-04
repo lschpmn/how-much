@@ -9,16 +9,40 @@ class DB {
   data: DbSchema;
 
   constructor() {
+    const startingTypeObj = {
+      'aaaaaaaa': {
+        id: 'aaaaaaaa',
+        name: 'Test',
+        halfLife: 30 * 60 * 1000,
+        position: 0,
+      },
+      'bbbbbbbb': {
+        id: 'bbbbbbbb',
+        name: 'Caffeine',
+        halfLife: 5 * 60 * 60 * 1000,
+        position: 1,
+      },
+    };
+
     if (exists(DB_PATH)) {
       this.data = read(DB_PATH, 'json');
+
+      if (!this.data.typeObj) {
+        this.data.typeObj = startingTypeObj;
+        this.data.dosages.forEach(d => d.typeId = 'aaaaaaaa');
+        this.save();
+      }
     } else {
       this.data = {
         dosages: [],
+        typeObj: startingTypeObj,
       };
 
       this.save();
     }
   }
+
+  // Dosages
 
   addDosage(dosage: Dosage) {
     this.data.dosages.push(dosage);
@@ -33,6 +57,12 @@ class DB {
 
   getDosages(): Dosage[] {
     return cloneDeep(this.data.dosages);
+  }
+
+  // Types
+
+  getTypes() {
+    return cloneDeep(this.data.typeObj);
   }
 
   private save = throttle(() => {

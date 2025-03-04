@@ -1,13 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { Action, Dosage } from '../../types';
+import { Action, Dosage, TypeObj } from '../../types';
 import { CombinedDosagesObj, DosageState } from '../types';
-import { calculateReducedValue, HALF_LIFE } from './utils';
+import { calculateReducedValue } from './utils';
 
 const dosagesSlice = createSlice({
   name: 'dosages',
   initialState: {
     dosages: [],
     combinedDosagesObj: {},
+    typeObj: {},
   } as DosageState,
   reducers: {
     addDosageSendServer: (state, action: Action<Dosage>) => {
@@ -16,24 +17,42 @@ const dosagesSlice = createSlice({
       state.dosages.push(dosage);
       state.dosages.sort((a, b) => b.timestamp - a.timestamp);
 
-      addDosageToCombinedDosagesObj(dosage, state.combinedDosagesObj, HALF_LIFE);
+      addDosageToCombinedDosagesObj(dosage, state.combinedDosagesObj,
+                                    state.typeObj[dosage.typeId].halfLife);
     },
     deleteDosageSendServer: (state, action: Action<string>) => {
       const id = action.payload;
 
       state.dosages = state.dosages.filter(d => d.id !== id);
-      state.combinedDosagesObj = getCombinedDosagesObj(state.dosages, HALF_LIFE);
+
+      const type = state.typeObj[state.currentTypeId];
+      const filteredDosages = state.dosages.filter(d => d.typeId === type.id);
+      state.combinedDosagesObj = getCombinedDosagesObj(filteredDosages, type.halfLife);
+    },
+    initSet: (state, action: Action<[Dosage[], TypeObj]>) => {
+      const [dosages, typeObj] = action.payload;
+
+      state.dosages = dosages;
+      state.typeObj = typeObj;
+
+      const type = Object.values(typeObj).find(t => t.position === 0);
+      const filteredDosages = dosages.filter(d => d.typeId === type.id);
+      state.combinedDosagesObj = getCombinedDosagesObj(filteredDosages, type.halfLife);
+      state.currentTypeId = type.id;
     },
     setDosages: (state, action: Action<Dosage[]>) => {
-      const newDosages = action.payload;
+      const dosages = action.payload;
 
-      state.dosages = newDosages;
-      state.combinedDosagesObj = getCombinedDosagesObj(newDosages, HALF_LIFE);
+      state.dosages = dosages;
+
+      const type = state.typeObj[state.currentTypeId];
+      const filteredDosages = state.dosages.filter(d => d.typeId === type.id);
+      state.combinedDosagesObj = getCombinedDosagesObj(filteredDosages, type.halfLife);
     },
   },
 });
 
-export const { addDosageSendServer, deleteDosageSendServer, setDosages } = dosagesSlice.actions;
+export const { addDosageSendServer, deleteDosageSendServer, initSet, setDosages } = dosagesSlice.actions;
 export const dosagesReducer = dosagesSlice.reducer;
 
 function getCombinedDosagesObj(dosages: Dosage[], halfLife: number): CombinedDosagesObj {
