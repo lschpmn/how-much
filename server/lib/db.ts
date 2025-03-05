@@ -1,6 +1,7 @@
 import { exists, read, writeAsync } from 'fs-jetpack';
 import { cloneDeep, throttle } from 'lodash';
 import { join } from 'path';
+import { startingTypeObj } from '../../constants';
 import { DbSchema, Dosage } from '../../types';
 
 const DB_PATH = join(__dirname, '../..', 'bin', 'db.json');
@@ -9,21 +10,6 @@ class DB {
   data: DbSchema;
 
   constructor() {
-    const startingTypeObj = {
-      'aaaaaaaa': {
-        id: 'aaaaaaaa',
-        name: 'Test',
-        halfLife: 30 * 60 * 1000,
-        position: 0,
-      },
-      'bbbbbbbb': {
-        id: 'bbbbbbbb',
-        name: 'Caffeine',
-        halfLife: 5 * 60 * 60 * 1000,
-        position: 1,
-      },
-    };
-
     if (exists(DB_PATH)) {
       this.data = read(DB_PATH, 'json');
 

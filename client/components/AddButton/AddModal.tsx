@@ -1,8 +1,10 @@
 import { Button, Modal, Paper } from '@mui/material';
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Dosage } from '../../../types';
 import { addDosageSendServer } from '../../lib/reducer';
 import { getRndStr, useAction } from '../../lib/utils';
+import { State } from '../../types';
 import SetAmount from './SetAmount';
 import SetTimestamp from './SetTimestamp';
 
@@ -12,6 +14,7 @@ type Props = {
 };
 
 const AddModal = ({ isOpen, setIsOpen }: Props) => {
+  const currentTypeId: string = useSelector((state: State) => state.dosages.currentTypeId);
   const [amount, setAmount] = useState(0);
   const [timestamp, setTimestamp] = useState(0);
   const addDosageAction = useAction(addDosageSendServer);
@@ -21,6 +24,7 @@ const AddModal = ({ isOpen, setIsOpen }: Props) => {
       amount,
       id: getRndStr(),
       timestamp,
+      typeId: currentTypeId,
     } as Dosage;
 
     addDosageAction(dosage);

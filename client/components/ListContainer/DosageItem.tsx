@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { isEqual } from 'lodash';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Dosage } from '../../../types';
+import { Dosage, Type } from '../../../types';
 import { deleteDosageSendServer } from '../../lib/reducer';
 import { constructRemainingStr, useAction } from '../../lib/utils';
 import { CombinedDosagesObj, State } from '../../types';
@@ -16,6 +16,7 @@ type Props = {
 
 const DosageItem = ({ id, now }: Props) => {
   const combinedDosagesObj: CombinedDosagesObj = useSelector((state: State) => state.dosages.combinedDosagesObj, isEqual);
+  const type: Type = useSelector((state: State) => state.dosages.typeObj[state.dosages.currentTypeId], isEqual);
   const dosage: Dosage = useSelector((state: State) => state.dosages.dosages.find(d => d.id === id), isEqual);
   const [showDeleteIcon, setShowDeleteIcon] = useState(true);
   const deleteDosageAction = useAction(deleteDosageSendServer);
@@ -50,7 +51,7 @@ const DosageItem = ({ id, now }: Props) => {
       </div>
       <Typography style={{ padding: '0.5rem 0 1rem 0' }}>
         {dayjs(dosage.timestamp).format('h:mm A')}
-        {currentAmount > 0.5 && ' - ' + constructRemainingStr(currentAmount)}
+        {currentAmount > 0.5 && ' - ' + constructRemainingStr(currentAmount, type.halfLife)}
       </Typography>
       <LinearProgress variant="determinate" value={(currentAmount / dosage.amount) * 100}/>
     </Paper>

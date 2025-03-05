@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { Action, Dosage, TypeObj } from '../../types';
+import { Action, Dosage, TypesObj } from '../../types';
 import { CombinedDosagesObj, DosageState } from '../types';
 import { calculateReducedValue } from './utils';
 
@@ -29,7 +29,7 @@ const dosagesSlice = createSlice({
       const filteredDosages = state.dosages.filter(d => d.typeId === type.id);
       state.combinedDosagesObj = getCombinedDosagesObj(filteredDosages, type.halfLife);
     },
-    initSet: (state, action: Action<[Dosage[], TypeObj]>) => {
+    initSet: (state, action: Action<[Dosage[], TypesObj]>) => {
       const [dosages, typeObj] = action.payload;
 
       state.dosages = dosages;
@@ -39,6 +39,13 @@ const dosagesSlice = createSlice({
       const filteredDosages = dosages.filter(d => d.typeId === type.id);
       state.combinedDosagesObj = getCombinedDosagesObj(filteredDosages, type.halfLife);
       state.currentTypeId = type.id;
+    },
+    setCurrentDosageId: (state, action: Action<string>) => {
+      state.currentTypeId = action.payload;
+
+      const type = state.typeObj[state.currentTypeId];
+      const filteredDosages = state.dosages.filter(d => d.typeId === type.id);
+      state.combinedDosagesObj = getCombinedDosagesObj(filteredDosages, type.halfLife);
     },
     setDosages: (state, action: Action<Dosage[]>) => {
       const dosages = action.payload;
@@ -52,7 +59,14 @@ const dosagesSlice = createSlice({
   },
 });
 
-export const { addDosageSendServer, deleteDosageSendServer, initSet, setDosages } = dosagesSlice.actions;
+export const {
+  addDosageSendServer,
+  deleteDosageSendServer,
+  initSet,
+  setCurrentDosageId,
+  setDosages,
+} = dosagesSlice.actions;
+
 export const dosagesReducer = dosagesSlice.reducer;
 
 function getCombinedDosagesObj(dosages: Dosage[], halfLife: number): CombinedDosagesObj {

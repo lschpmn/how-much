@@ -1,5 +1,7 @@
 import { TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import React, { ChangeEvent, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { State } from '../../types';
 
 type Props = {
   amount: number,
@@ -7,7 +9,9 @@ type Props = {
 };
 
 const SetAmount = ({ amount, setAmount }: Props) => {
-  const [preset, setPreset] = useState('small');
+  const currentTypeId: string = useSelector((state: State) => state.dosages.currentTypeId);
+  const [position, setPosition] = useState(0);
+  const presets = presetsObj[currentTypeId] || [];
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = +e.target.value;
@@ -15,38 +19,40 @@ const SetAmount = ({ amount, setAmount }: Props) => {
     else setAmount(0);
   };
 
+  const buttonClicked = (position: number, value: number) => {
+    setPosition(position);
+    setAmount(value);
+  };
+
   useEffect(() => {
-    switch (preset) {
-      case 'small':
-        setAmount(10);
-        break;
-      case 'medium':
-        setAmount(25);
-        break;
-      case 'large':
-        setAmount(100);
-        break;
-      case 'custom':
-        setAmount(0);
-        break;
-    }
-  }, [preset]);
+    setAmount(presets[0].value);
+  }, []);
 
   return (
     <div>
-      <ToggleButtonGroup color="primary" value={preset} style={{ marginBottom: '1rem', display: 'block' }}>
-        <ToggleButton onChange={() => setPreset('small')} value="small">Small</ToggleButton>
-        <ToggleButton onChange={() => setPreset('medium')} value="medium">Medium</ToggleButton>
-        <ToggleButton onChange={() => setPreset('large')} value="large">Large</ToggleButton>
-        <ToggleButton onChange={() => setPreset('custom')} value="custom">Custom</ToggleButton>
+      <ToggleButtonGroup color="primary" value={position} style={{ marginBottom: '1rem', display: 'block' }}>
+        {presets.map((p, i) => (
+          <ToggleButton key={i} onChange={() => buttonClicked(i, p.value)} value={i}>{p.label}</ToggleButton>
+        ))}
+        <ToggleButton onChange={() => buttonClicked(-1, 0)} value={-1}>Custom</ToggleButton>
       </ToggleButtonGroup>
-      {preset === 'custom' && <TextField
+      {position === -1 && <TextField
         label="Amount"
         onChange={onChange}
         value={amount}
       />}
     </div>
   );
+};
+
+const presetsObj: { [id: string]: { label: string, value: number }[] } = {
+  'aaaaaaaa': [
+    { label: 'Medium', value: 20 },
+    { label: 'Large', value: 100 },
+  ],
+  'bbbbbbbb': [
+    { label: 'Medium', value: 34 },
+  ],
 };
 
 export default SetAmount;

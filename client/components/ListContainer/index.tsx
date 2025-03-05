@@ -14,9 +14,13 @@ type Props = {
 const ListContainer = ({ now }: Props) => {
   const dosages: Dosage[] = useSelector((state: State) => state.dosages.dosages, isEqual);
   const combinedDosagesObj: CombinedDosagesObj = useSelector((state: State) => state.dosages.combinedDosagesObj, isEqual);
+  const currentTypeId: string = useSelector((state: State) => state.dosages.currentTypeId);
   const [showGraph, setShowGraph] = useSearchParamBooleanValue('showGraph');
   const [showAll, setShowAll] = useSearchParamBooleanValue('showAll');
-  const filteredDosages = dosages.filter(d => showAll || combinedDosagesObj[now]?.[`amount-${d.id}`] > 0.5).slice(0, 100);
+  const filteredDosages = dosages
+    .filter(d => d.typeId === currentTypeId
+      && (showAll || combinedDosagesObj[now]?.[`amount-${d.id}`] > 0.5))
+    .slice(0, 100);
 
   return (
     <div style={{ margin: '3.5rem 0 2rem 0' }}>
@@ -30,7 +34,7 @@ const ListContainer = ({ now }: Props) => {
       </Paper>
 
       {showGraph && (
-        <span style={{ userSelect: 'none' }}><GraphComponent dosages={dosages} showAll={showAll}/></span>
+        <GraphComponent dosageLength={filteredDosages.length} showAll={showAll}/>
       )}
 
       {filteredDosages.map(dosage => (

@@ -11,25 +11,33 @@ import { getNowMinute } from '../../lib/utils';
 import { CombinedDosage, CombinedDosagesObj, State } from '../../types';
 
 type Props = {
-  dosages: Dosage[],
+  dosageLength: number,
   showAll: boolean,
 };
 
-const GraphComponent = ({ dosages, showAll }: Props) => {
+const GraphComponent = ({ dosageLength, showAll }: Props) => {
   const combinedDosagesObj: CombinedDosagesObj = useSelector((state: State) => state.dosages.combinedDosagesObj, isEqual);
+  const hasLoaded = useSelector((state: State) => !!state.dosages.dosages.length);
   const theme = useTheme();
   const nowMinute = getNowMinute();
 
   const combinedDosages = useMemo(() => {
-    return Object.values(combinedDosagesObj)
+    let combinedDosages = Object.values(combinedDosagesObj)
       .filter(dosage => dosage.timestamp % 60000 === 0)
       .sort((a, b) => a.timestamp - b.timestamp);
-  }, [dosages.length]);
+
+    if (combinedDosages.length > 1440) {
+      // if there's more than a day of dosages, reduces to once every five minutes
+      combinedDosages = combinedDosages.filter(dosage => dosage.timestamp % 300000 === 0);
+    }
+
+    return combinedDosages;
+  }, [dosageLength]);
 
   if (!combinedDosagesObj[nowMinute]) {
     return (
       <Typography color="textPrimary" style={{ textAlign: 'center' }} variant="h3">
-        {dosages.length === 0 ? 'LOADING' : 'No Remaining Amount'}
+        {hasLoaded ? 'No Remaining Amount': 'LOADING'}
       </Typography>
     );
   }
@@ -38,19 +46,21 @@ const GraphComponent = ({ dosages, showAll }: Props) => {
   const [xMax, xMin, yMax, yMin] = getGraphEdges(combinedDosages.filter(d => d.timestamp >= nowMinute), showAll);
 
   return (
-    <LineChart
-      grid={{ horizontal: true, vertical: true }}
-      dataset={combinedDosages}
-      xAxis={[{
-        dataKey: 'timestamp',
-        max: xMax,
-        min: xMin,
-        valueFormatter: value => dayjs(value).format('hh:mma'),
-      }]}
-      yAxis={[{ max: yMax, min: yMin }]}
-      series={getSeries(amounts, yMax > 4 && !showAll, dosages.length, theme.palette)}
-      height={300}
-    />
+    <span style={{ userSelect: 'none' }}>
+      <LineChart
+        grid={{ horizontal: true, vertical: true }}
+        dataset={combinedDosages}
+        xAxis={[{
+          dataKey: 'timestamp',
+          max: xMax,
+          min: xMin,
+          valueFormatter: value => dayjs(value).format('hh:mma'),
+        }]}
+        yAxis={[{ max: yMax, min: yMin }]}
+        series={getSeries(amounts, yMax > 4 && !showAll, dosageLength, theme.palette)}
+        height={300}
+      />
+    </span>
   );
 };
 

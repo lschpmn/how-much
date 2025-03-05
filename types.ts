@@ -6,7 +6,7 @@ export type Action<T> = {
 
 export type DbSchema = {
   dosages: Dosage[],
-  typeObj: TypeObj,
+  typeObj: TypesObj,
 };
 
 export type Dosage = {
@@ -34,4 +34,4 @@ export type Type = {
   position: number,
 };
 
-export type TypeObj = { [id: string]: Type };
+export type TypesObj = { [id: string]: Type };
