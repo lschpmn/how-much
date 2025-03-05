@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-const TARGET_RATIO = 0.5;
+const TARGET_RATIO = 1;
 
 export const calculateReducedValue = (startingAmount: number, timeElapsed: number, halfLife: number) =>
   startingAmount * Math.pow(0.5, timeElapsed / halfLife);

@@ -82,7 +82,7 @@ const getSeries = (amounts: string[], bigMode: boolean, length: number,
     stack: 'timestamp',
     stackOrder: 'reverse' as StackOrderType,
     valueFormatter: v => bigMode
-      ? v >= 0.5 ? v?.toFixed(1) : null
+      ? v >= 1 ? v?.toFixed(1) : null
       : v?.toFixed(3),
   })),
 ];

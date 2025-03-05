@@ -19,7 +19,7 @@ const ListContainer = ({ now }: Props) => {
   const [showAll, setShowAll] = useSearchParamBooleanValue('showAll');
   const filteredDosages = dosages
     .filter(d => d.typeId === currentTypeId
-      && (showAll || combinedDosagesObj[now]?.[`amount-${d.id}`] > 0.5))
+      && (showAll || combinedDosagesObj[now]?.[`amount-${d.id}`] > 1))
     .slice(0, 100);
 
   return (

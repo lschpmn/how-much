@@ -51,7 +51,7 @@ const DosageItem = ({ id, now }: Props) => {
       </div>
       <Typography style={{ padding: '0.5rem 0 1rem 0' }}>
         {dayjs(dosage.timestamp).format('h:mm A')}
-        {currentAmount > 0.5 && ' - ' + constructRemainingStr(currentAmount, type.halfLife)}
+        {currentAmount > 1 && ' - ' + constructRemainingStr(currentAmount, type.halfLife)}
       </Typography>
       <LinearProgress variant="determinate" value={(currentAmount / dosage.amount) * 100}/>
     </Paper>
