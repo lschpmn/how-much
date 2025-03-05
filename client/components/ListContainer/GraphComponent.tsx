@@ -6,7 +6,6 @@ import dayjs from 'dayjs';
 import { isEqual } from 'lodash';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { Dosage } from '../../../types';
 import { getNowMinute } from '../../lib/utils';
 import { CombinedDosage, CombinedDosagesObj, State } from '../../types';
 

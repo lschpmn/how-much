@@ -38,7 +38,7 @@ const ListContainer = ({ now }: Props) => {
       )}
 
       {filteredDosages.map(dosage => (
-        <DosageItem key={dosage.id} id={dosage.id} now={now}/>
+        <DosageItem key={dosage.id} dosage={dosage} now={now}/>
       ))}
     </div>
   );

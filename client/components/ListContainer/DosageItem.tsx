@@ -10,17 +10,16 @@ import { constructRemainingStr, useAction } from '../../lib/utils';
 import { CombinedDosagesObj, State } from '../../types';
 
 type Props = {
-  id: string,
+  dosage: Dosage,
   now: number,
 };
 
-const DosageItem = ({ id, now }: Props) => {
+const DosageItem = ({ dosage, now }: Props) => {
   const combinedDosagesObj: CombinedDosagesObj = useSelector((state: State) => state.dosages.combinedDosagesObj, isEqual);
   const type: Type = useSelector((state: State) => state.dosages.typeObj[state.dosages.currentTypeId], isEqual);
-  const dosage: Dosage = useSelector((state: State) => state.dosages.dosages.find(d => d.id === id), isEqual);
   const [showDeleteIcon, setShowDeleteIcon] = useState(true);
   const deleteDosageAction = useAction(deleteDosageSendServer);
-  const currentAmount = combinedDosagesObj[now]?.[`amount-${id}`] || 0;
+  const currentAmount = combinedDosagesObj[now]?.[`amount-${dosage.id}`] || 0;
 
   return (
     <Paper
@@ -43,7 +42,7 @@ const DosageItem = ({ id, now }: Props) => {
         ) : (
           <span>
             <Typography component="span">Are you sure?</Typography>
-            <Button color="error" onClick={() => deleteDosageAction(id)}>Yes</Button>
+            <Button color="error" onClick={() => deleteDosageAction(dosage.id)}>Yes</Button>
             <Button color="success" onClick={() => setShowDeleteIcon(true)}>No</Button>
           </span>
         )}
