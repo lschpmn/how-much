@@ -9,7 +9,7 @@ export const startingTypeObj = {
   'bbbbbbbb': {
     id: 'bbbbbbbb',
     name: 'Caffeine',
-    halfLife: 5 * 60 * 60 * 1000,
+    halfLife: 4 * 60 * 60 * 1000,
     position: 1,
   },
 };

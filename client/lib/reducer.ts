@@ -17,17 +17,14 @@ const dosagesSlice = createSlice({
       state.dosages.push(dosage);
       state.dosages.sort((a, b) => b.timestamp - a.timestamp);
 
-      addDosageToCombinedDosagesObj(dosage, state.combinedDosagesObj,
-                                    state.typeObj[dosage.typeId].halfLife);
+      updateStateCombinedDosagesObj(state);
     },
     deleteDosageSendServer: (state, action: Action<string>) => {
       const id = action.payload;
 
       state.dosages = state.dosages.filter(d => d.id !== id);
 
-      const type = state.typeObj[state.currentTypeId];
-      const filteredDosages = state.dosages.filter(d => d.typeId === type.id);
-      state.combinedDosagesObj = getCombinedDosagesObj(filteredDosages, type.halfLife);
+      updateStateCombinedDosagesObj(state);
     },
     initSet: (state, action: Action<[Dosage[], TypesObj]>) => {
       const [dosages, typeObj] = action.payload;
@@ -35,26 +32,19 @@ const dosagesSlice = createSlice({
       state.dosages = dosages;
       state.typeObj = typeObj;
 
-      const type = Object.values(typeObj).find(t => t.position === 0);
-      const filteredDosages = dosages.filter(d => d.typeId === type.id);
-      state.combinedDosagesObj = getCombinedDosagesObj(filteredDosages, type.halfLife);
-      state.currentTypeId = type.id;
+      state.currentTypeId = getTypeFromUrl() || Object.values(typeObj).find(t => t.position === 0).id;
+      updateStateCombinedDosagesObj(state);
     },
     setCurrentDosageId: (state, action: Action<string>) => {
       state.currentTypeId = action.payload;
 
-      const type = state.typeObj[state.currentTypeId];
-      const filteredDosages = state.dosages.filter(d => d.typeId === type.id);
-      state.combinedDosagesObj = getCombinedDosagesObj(filteredDosages, type.halfLife);
+      setTypeToUrl(action.payload);
+      updateStateCombinedDosagesObj(state);
     },
     setDosages: (state, action: Action<Dosage[]>) => {
-      const dosages = action.payload;
+      state.dosages = action.payload;
 
-      state.dosages = dosages;
-
-      const type = state.typeObj[state.currentTypeId];
-      const filteredDosages = state.dosages.filter(d => d.typeId === type.id);
-      state.combinedDosagesObj = getCombinedDosagesObj(filteredDosages, type.halfLife);
+      updateStateCombinedDosagesObj(state);
     },
   },
 });
@@ -68,6 +58,12 @@ export const {
 } = dosagesSlice.actions;
 
 export const dosagesReducer = dosagesSlice.reducer;
+
+function updateStateCombinedDosagesObj(state: DosageState) {
+  const type = state.typeObj[state.currentTypeId];
+  const filteredDosages = state.dosages.filter(d => d.typeId === type.id);
+  state.combinedDosagesObj = getCombinedDosagesObj(filteredDosages, type.halfLife);
+}
 
 function getCombinedDosagesObj(dosages: Dosage[], halfLife: number): CombinedDosagesObj {
   const combinedDosagesObj: CombinedDosagesObj = {};
@@ -100,3 +96,14 @@ function addDosageToCombinedDosagesObj(dosage: Dosage, combinedDosagesObj: Combi
     else timestamp += 5000;
   }
 }
+
+const getTypeFromUrl = (): string | null => {
+  const url = new URL(window.location.toString());
+  return url.searchParams.get('type');
+};
+
+const setTypeToUrl = (typeId: string) => {
+  const url = new URL(window.location.toString());
+  url.searchParams.set('type', typeId);
+  history.replaceState(null, '', url);
+};

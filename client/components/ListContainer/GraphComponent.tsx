@@ -16,6 +16,7 @@ type Props = {
 
 const GraphComponent = ({ dosageLength, showAll }: Props) => {
   const combinedDosagesObj: CombinedDosagesObj = useSelector((state: State) => state.dosages.combinedDosagesObj, isEqual);
+  const typeId: string = useSelector((state: State) => state.dosages.currentTypeId);
   const hasLoaded = useSelector((state: State) => !!state.dosages.dosages.length);
   const theme = useTheme();
   const nowMinute = getNowMinute();
@@ -31,7 +32,7 @@ const GraphComponent = ({ dosageLength, showAll }: Props) => {
     }
 
     return combinedDosages;
-  }, [dosageLength]);
+  }, [dosageLength, typeId]);
 
   if (!combinedDosagesObj[nowMinute]) {
     return (
