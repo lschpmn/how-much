@@ -34,7 +34,12 @@ const ListContainer = ({ now }: Props) => {
       </Paper>
 
       {showGraph && (
-        <GraphComponent dosageLength={filteredDosages.length} showAll={showAll}/>
+        <GraphComponent
+          combinedDosagesObj={combinedDosagesObj}
+          currentTypeId={currentTypeId}
+          dosageLength={dosages.length}
+          showAll={showAll}
+        />
       )}
 
       {filteredDosages.map(dosage => (

@@ -3,21 +3,18 @@ import { LineSeriesType, StackOrderType } from '@mui/x-charts';
 import { MakeOptional } from '@mui/x-charts/internals';
 import { LineChart } from '@mui/x-charts/LineChart';
 import dayjs from 'dayjs';
-import { isEqual } from 'lodash';
 import React, { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import { getNowMinute } from '../../lib/utils';
-import { CombinedDosage, CombinedDosagesObj, State } from '../../types';
+import { CombinedDosage, CombinedDosagesObj } from '../../types';
 
 type Props = {
+  combinedDosagesObj: CombinedDosagesObj,
+  currentTypeId: string,
   dosageLength: number,
   showAll: boolean,
 };
 
-const GraphComponent = ({ dosageLength, showAll }: Props) => {
-  const combinedDosagesObj: CombinedDosagesObj = useSelector((state: State) => state.dosages.combinedDosagesObj, isEqual);
-  const typeId: string = useSelector((state: State) => state.dosages.currentTypeId);
-  const hasLoaded = useSelector((state: State) => !!state.dosages.dosages.length);
+const GraphComponent = ({ combinedDosagesObj, currentTypeId, dosageLength, showAll }: Props) => {
   const theme = useTheme();
   const nowMinute = getNowMinute();
 
@@ -32,12 +29,12 @@ const GraphComponent = ({ dosageLength, showAll }: Props) => {
     }
 
     return combinedDosages;
-  }, [dosageLength, typeId]);
+  }, [dosageLength, currentTypeId]);
 
   if (!combinedDosagesObj[nowMinute]) {
     return (
       <Typography color="textPrimary" style={{ textAlign: 'center' }} variant="h3">
-        {hasLoaded ? 'No Remaining Amount': 'LOADING'}
+        {!!dosageLength ? 'No Remaining Amount' : 'LOADING'}
       </Typography>
     );
   }

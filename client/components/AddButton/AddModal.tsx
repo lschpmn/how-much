@@ -27,8 +27,8 @@ const AddModal = ({ isOpen, setIsOpen }: Props) => {
       typeId: currentTypeId,
     } as Dosage;
 
-    addDosageAction(dosage);
     setIsOpen(false);
+    addDosageAction(dosage);
   };
 
   return (
