@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 const TARGET_RATIO = 1;
@@ -28,6 +28,11 @@ export const getNowMinute = (): number => {
 
 export const getRndStr = (): string => Math.random().toString(36).slice(-8);
 
+export const getStepTime = (halfLife: number) => {
+  if (halfLife > 2 * 60 * 60 * 1000) return 60 * 1000;
+  else return 5 * 1000;
+};
+
 export const useAction = <T extends Function>(action: T, deps?): T => {
   const dispatch = useDispatch();
 
@@ -35,16 +40,15 @@ export const useAction = <T extends Function>(action: T, deps?): T => {
     dispatch(action(...args)), deps ? [dispatch, ...deps] : [dispatch]) as any;
 };
 
-export const useNow = (): [now: number, updateNow: () => void] => {
-  const [now, setNow] = useState(() => {
-    const startingNow = Date.now();
-    return startingNow - (startingNow % 5000);
-  });
+export const useNow = (halfLife: number): [now: number, updateNow: () => void] => {
+  const [now, setNow] = useState(getNowMinute);
 
   const updateNow = () => {
     const now = Date.now()
-    setNow(now - (now % 5000));
+    setNow(now - (now % getStepTime(halfLife)));
   };
+
+  useEffect(updateNow, [halfLife]);
 
   return [now, updateNow];
 };

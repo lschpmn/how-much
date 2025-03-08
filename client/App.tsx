@@ -1,12 +1,15 @@
 import { styled } from '@mui/material';
 import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import AddButton from './components/AddButton';
 import ListContainer from './components/ListContainer';
 import TopBar from './components/TopBar';
 import { useNow } from './lib/utils';
+import { State } from './types';
 
 const App = () => {
-  const [now, updateNow] = useNow();
+  const halfLife = useSelector(({ dosages }: State) => dosages.typeObj?.[dosages.currentTypeId]?.halfLife);
+  const [now, updateNow] = useNow(halfLife);
 
   useEffect(() => {
     // restart needed to fix MUI Charts memory leak
@@ -21,7 +24,7 @@ const App = () => {
       clearInterval(intervalId);
       clearTimeout(timerId);
     }
-  }, []);
+  }, [halfLife]);
 
   return (
     <Container>

@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Action, Dosage, TypesObj } from '../../types';
 import { CombinedDosagesObj, DosageState } from '../types';
-import { calculateReducedValue, getNowMinute } from './utils';
+import { calculateReducedValue, getNowMinute, getStepTime } from './utils';
 
 const dosagesSlice = createSlice({
   name: 'dosages',
@@ -82,6 +82,8 @@ function addDosageToCombinedDosagesObj(dosage: Dosage, combinedDosagesObj: Combi
   let timestamp = getNowMinute();
   let times = 0
 
+  if (calculateReducedValue(dosage.amount, timestamp - dosage.timestamp, halfLife) < 0.01) return;
+
   while (times < 100000) {
     times++;
 
@@ -93,7 +95,7 @@ function addDosageToCombinedDosagesObj(dosage: Dosage, combinedDosagesObj: Combi
     combinedDosage['amount-total'] += amount;
 
     if (amount < 0.01) times = Number.MAX_VALUE;
-    else timestamp += 5000;
+    else timestamp += getStepTime(halfLife);
   }
 }
 
