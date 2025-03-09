@@ -18,18 +18,10 @@ const GraphComponent = ({ combinedDosagesObj, currentTypeId, dosageLength, showA
   const theme = useTheme();
   const nowMinute = getNowMinute();
 
-  const combinedDosages = useMemo(() => {
-    let combinedDosages = Object.values(combinedDosagesObj)
-      .filter(dosage => dosage.timestamp % 60000 === 0)
-      .sort((a, b) => a.timestamp - b.timestamp);
-
-    if (combinedDosages.length > 1440) {
-      // if there's more than a day of dosages, reduces to once every five minutes
-      combinedDosages = combinedDosages.filter(dosage => dosage.timestamp % 300000 === 0);
-    }
-
-    return combinedDosages;
-  }, [dosageLength, currentTypeId]);
+  const combinedDosages = useCombinedDosages(combinedDosagesObj, dosageLength, currentTypeId);
+  const amounts = Object.keys(combinedDosagesObj[nowMinute] || {})?.filter(k => k !== 'timestamp' && k !== 'amount-total') || [];
+  const [xMax, xMin, yMax, yMin] = getGraphEdges(combinedDosages.filter(d => d.timestamp >= nowMinute), showAll);
+  const series = useSeries(amounts, yMax > 4 && !showAll, dosageLength, theme.palette);
 
   if (!combinedDosagesObj[nowMinute]) {
     return (
@@ -38,9 +30,6 @@ const GraphComponent = ({ combinedDosagesObj, currentTypeId, dosageLength, showA
       </Typography>
     );
   }
-
-  const amounts = Object.keys(combinedDosagesObj[nowMinute]).filter(k => k !== 'timestamp' && k !== 'amount-total');
-  const [xMax, xMin, yMax, yMin] = getGraphEdges(combinedDosages.filter(d => d.timestamp >= nowMinute), showAll);
 
   return (
     <span style={{ userSelect: 'none' }}>
@@ -54,15 +43,29 @@ const GraphComponent = ({ combinedDosagesObj, currentTypeId, dosageLength, showA
           valueFormatter: value => dayjs(value).format('hh:mma'),
         }]}
         yAxis={[{ max: yMax, min: yMin }]}
-        series={getSeries(amounts, yMax > 4 && !showAll, dosageLength, theme.palette)}
+        series={series}
         height={300}
       />
     </span>
   );
 };
 
-const getSeries = (amounts: string[], bigMode: boolean, length: number,
-                   palette: Palette): MakeOptional<LineSeriesType, 'type'>[] => [
+const useCombinedDosages = (combinedDosagesObj: CombinedDosagesObj, dosageLength: number,
+                            currentTypeId: string) => useMemo(() => {
+  let combinedDosages = Object.values(combinedDosagesObj)
+    .filter(dosage => dosage.timestamp % 60000 === 0)
+    .sort((a, b) => a.timestamp - b.timestamp);
+
+  if (combinedDosages.length > 1440) {
+    // if there's more than a day of dosages, reduces to once every five minutes
+    combinedDosages = combinedDosages.filter(dosage => dosage.timestamp % 300000 === 0);
+  }
+
+  return combinedDosages;
+}, [dosageLength, currentTypeId]);
+
+const useSeries = (amounts: string[], bigMode: boolean, length: number,
+                   palette: Palette): MakeOptional<LineSeriesType, 'type'>[] => useMemo(() => [
   {
     color: '#121212',
     dataKey: 'amount-total',
@@ -82,9 +85,10 @@ const getSeries = (amounts: string[], bigMode: boolean, length: number,
       ? v >= 1 ? v?.toFixed(1) : null
       : v?.toFixed(3),
   })),
-];
+], [bigMode, length, amounts.join()]);
 
 const getGraphEdges = (combinedDosages: CombinedDosage[], showAll: boolean) => {
+  if (!combinedDosages.length) return [];
   const yMax = combinedDosages[0]['amount-total'];
   const yMin = yMax > 4 && !showAll ? 1 : 0.01;
   const xMin = combinedDosages[0].timestamp;
