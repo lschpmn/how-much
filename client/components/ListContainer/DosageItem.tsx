@@ -20,6 +20,10 @@ const DosageItem = ({ dosage, now }: Props) => {
   const [showDeleteIcon, setShowDeleteIcon] = useState(true);
   const deleteDosageAction = useAction(deleteDosageSendServer);
   const currentAmount = combinedDosagesObj[now]?.[`amount-${dosage.id}`] || 0;
+  let itemTotal: string;
+
+  if (currentAmount > 1 || currentAmount === 0) itemTotal = ''+Math.round(currentAmount);
+  else itemTotal = currentAmount.toFixed(3)
 
   return (
     <Paper
@@ -33,7 +37,7 @@ const DosageItem = ({ dosage, now }: Props) => {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography>{Math.round(currentAmount)} / {dosage.amount}</Typography>
+        <Typography>{itemTotal} / {dosage.amount}</Typography>
 
         {showDeleteIcon ? (
           <IconButton onClick={() => setShowDeleteIcon(false)}>
