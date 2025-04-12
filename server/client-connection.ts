@@ -1,5 +1,5 @@
 import express, { Express, Request, Response } from 'express';
-import { Server as ServerType } from 'https';
+import { Server as ServerType } from 'http';
 import { join } from 'path';
 import { Server, Socket } from 'socket.io';
 import webpack from 'webpack';

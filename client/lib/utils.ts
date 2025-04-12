@@ -33,6 +33,13 @@ export const getStepTime = (halfLife: number) => {
   else return 5 * 1000;
 };
 
+export const showValue = (value: number) => {
+  if (value >= 100) return ''+Math.round(value);
+  if (value >= 10) return value.toFixed(1);
+  if (value >= 1) return value.toFixed(2);
+  return null;
+};
+
 export const useAction = <T extends Function>(action: T, deps?): T => {
   const dispatch = useDispatch();
 

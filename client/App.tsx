@@ -15,7 +15,7 @@ const App = () => {
     // restart needed to fix MUI Charts memory leak
     let timerId = setTimeout(() => {
       const currentUrl: URL = new URL(window.location.toString());
-      window.location.assign(`http://${currentUrl.hostname}:${+currentUrl.port - 1}/${currentUrl.search}`);
+      window.location.assign(`http://${currentUrl.hostname}:${+currentUrl.port}/${currentUrl.search}`);
     }, 30 * 60 * 1000);
 
     const intervalId = setInterval(updateNow, 5 * 1000);

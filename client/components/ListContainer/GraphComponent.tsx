@@ -4,7 +4,7 @@ import { MakeOptional } from '@mui/x-charts/internals';
 import { LineChart } from '@mui/x-charts/LineChart';
 import dayjs from 'dayjs';
 import React, { useMemo } from 'react';
-import { getNowMinute } from '../../lib/utils';
+import { getNowMinute, showValue } from '../../lib/utils';
 import { CombinedDosage, CombinedDosagesObj } from '../../types';
 
 type Props = {
@@ -82,7 +82,7 @@ const useSeries = (amounts: string[], bigMode: boolean, length: number,
     stack: 'timestamp',
     stackOrder: 'reverse' as StackOrderType,
     valueFormatter: v => bigMode
-      ? v >= 1 ? v?.toFixed(1) : null
+      ? showValue(v)
       : v?.toFixed(3),
   })),
 ], [bigMode, length, amounts.join()]);
