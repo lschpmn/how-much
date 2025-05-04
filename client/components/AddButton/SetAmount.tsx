@@ -47,7 +47,7 @@ const SetAmount = ({ amount, setAmount }: Props) => {
 
 const presetsObj: { [id: string]: { label: string, value: number }[] } = {
   'aaaaaaaa': [
-    { label: 'Medium', value: 25 },
+    { label: 'Medium', value: 20 },
     { label: 'Large', value: 100 },
   ],
   'bbbbbbbb': [
