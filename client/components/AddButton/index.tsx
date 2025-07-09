@@ -1,4 +1,5 @@
-import { Button, Typography } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import { Button } from '@mui/material';
 import React, { useState } from 'react';
 import AddModal from './AddModal';
 
@@ -17,7 +18,7 @@ const AddButton = () => {
         }}
         variant="contained"
       >
-        <Typography>+</Typography>
+        <AddIcon/>
       </Button>
       <AddModal isOpen={isOpen} setIsOpen={setIsOpen}/>
     </span>
