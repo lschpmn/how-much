@@ -1,4 +1,4 @@
-import { AppBar, Tab, Tabs, Toolbar, Typography } from '@mui/material';
+import { AppBar, Tab, Tabs, Toolbar, Tooltip, Typography } from '@mui/material';
 import { isEqual } from 'lodash';
 import React from 'react';
 import { useSelector } from 'react-redux';
@@ -20,7 +20,7 @@ const TopBar = ({ now }: Props) => {
   const types = Object.values(typesObj)?.sort((a, b) => a.position - b.position) || [];
   let displayTotal: string;
 
-  if (total > 9.95 || total === 0) displayTotal = ''+Math.round(total);
+  if (total > 9.95 || total === 0) displayTotal = '' + Math.round(total);
   else if (total > 0.995) displayTotal = total.toFixed(1);
   else displayTotal = total.toFixed(2);
 
@@ -31,7 +31,12 @@ const TopBar = ({ now }: Props) => {
   return (
     <AppBar>
       <Toolbar style={{ display: 'flex', flexDirection: 'column' }}>
-        <Typography variant="h4">Total: {displayTotal}</Typography>
+        <Tooltip title={total}>
+          <Typography variant="h4">
+            Total: {displayTotal}
+          </Typography>
+        </Tooltip>
+
 
         <div style={{ width: '100%' }}>
           <Tabs onChange={changeDosageType} value={typesObj[currentTypeId]?.position || 0}>
