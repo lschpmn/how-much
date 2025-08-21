@@ -17,9 +17,11 @@ const ListContainer = ({ now }: Props) => {
   const currentTypeId: string = useSelector((state: State) => state.dosages.currentTypeId);
   const [showGraph, setShowGraph] = useSearchParamBooleanValue('showGraph');
   const [showAll, setShowAll] = useSearchParamBooleanValue('showAll');
+  const yMax = combinedDosagesObj[Object.keys(combinedDosagesObj).sort()[0]]?.['amount-total'];
+  const filterValue = yMax > 4 ? 1 : 0;
   const filteredDosages = dosages
     .filter(d => d.typeId === currentTypeId
-      && (showAll || combinedDosagesObj[now]?.[`amount-${d.id}`] > 1))
+      && (showAll || combinedDosagesObj[now]?.[`amount-${d.id}`] > filterValue))
     .slice(0, 100);
 
   return (
