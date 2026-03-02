@@ -13,16 +13,17 @@ const App = () => {
 
   useEffect(() => {
     // restart needed to fix MUI Charts memory leak
-    let timerId = setTimeout(() => {
+    // I'm disabling this for now, trusting the library maintainors fixed their issue
+    /*let timerId = setTimeout(() => {
       const currentUrl: URL = new URL(window.location.toString());
       window.location.assign(`http://${currentUrl.hostname}/${currentUrl.search}`);
-    }, 30 * 60 * 1000);
+    }, 30 * 60 * 1000);*/
 
     const intervalId = setInterval(updateNow, 5 * 1000);
 
     return () => {
       clearInterval(intervalId);
-      clearTimeout(timerId);
+      //clearTimeout(timerId);
     }
   }, [halfLife]);
 
