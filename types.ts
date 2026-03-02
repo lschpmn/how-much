@@ -1,3 +1,4 @@
+import { Socket } from 'socket.io';
 
 export type Action<T> = {
   payload: T,
@@ -24,7 +25,7 @@ export type Preset = {
 };
 
 export type SocketFunctions = {
-  [actionType: string]: (emit: EmitAction, emitAll: EmitAction) => (p?: any) => void,
+  [actionType: string]: (emit: EmitAction, emitAll: EmitAction, socket: Socket) => (p?: any) => void,
 };
 
 export type Type = {

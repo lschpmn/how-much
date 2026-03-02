@@ -18,21 +18,21 @@ export const connectSocket = (server: ServerType) => {
   // Socket.IO
   const io = new Server(server, { maxHttpBufferSize: 1024 * 1024 * 500 /*500MB*/ });
   io.on('connection', (socket: Socket) => {
-    log('client connected');
+    log('client connected', null, socket.handshake);
     const emitAction = createOutgoingFunc(socket);
     const emitAllAction = createOutgoingAllFunc(io);
 
     for (let actionType in services) {
       const func = services[actionType];
       socket.on(actionType, (p?: any) => {
-        log(`Incoming - ${actionType}`);
-        func(emitAction, emitAllAction)(p);
+        log(`Incoming - ${actionType}`, null, socket.handshake);
+        func(emitAction, emitAllAction, socket)(p);
       });
     }
 
     emitAction(initSet([db.getDosages(), db.getTypes()]), 'Client Init');
 
-    socket.on('disconnect', () => log('client disconnected'));
+    socket.on('disconnect', () => log('client disconnected', null, socket.handshake));
   });
 };
 
@@ -44,17 +44,21 @@ export const connectWeb = (app: Express) => {
     app.use(webpackHotMiddleware(compiler));
   }
 
+  app.use((req, res, next) => {
+    log('file response', req);
+    next();
+  });
+
   // App Routes
   app.use(express.static(join(__dirname, '..', 'public')));
 
-  app.use((req: Request, res: Response) => {
-    log(`404 - ${req.url} - sending index.html`);
+  app.use((req, res) => {
     res.sendFile(join(__dirname, '..', 'client', 'index.html'));
   });
 };
 
 const createOutgoingFunc = (socket: Socket): EmitAction => (action: Action<any>, reason?: string) => {
-  log(`Outgoing - ${action.type}` + (reason ? ` - ${reason}` : ''));
+  log(`Outgoing - ${action.type}` + (reason ? ` - ${reason}` : ''), null, socket.handshake);
   socket.emit('action', action);
 };
 

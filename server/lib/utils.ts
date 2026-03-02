@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+import { Request } from 'express';
+import { Handshake } from 'socket.io/dist/socket-types';
 
 const PROD_PORT = 50205;
 
@@ -13,5 +15,17 @@ export const getCommandLineArguments = (): { PORT: number, DEVELOP: boolean } =>
   };
 };
 
-export const log = (message: string) =>
-  console.log(`${dayjs().format('hh:mm:ss.SSSA ddd MM/DD/YY')} - ${message}`);
+export const log = (message: string, req: Request = null, handshake: Handshake = null) => {
+  const timeStr = dayjs().format('hh:mm:ss.SSSA ddd MM/DD/YY');
+  let requestStr = '';
+
+  if (req) {
+    const ip = (req.header('x-real-ip') || req.ip).replace('::ffff:', '');
+    requestStr = ` - ip:${ip} - url:${req.url}`;
+  } else if (handshake) {
+    const ip = (handshake.headers['x-real-ip'] as string || handshake.address).replace('::ffff:', '');
+    requestStr = ` - ip:${ip}`;
+  }
+
+  console.log(`${timeStr}${requestStr} - ${message}`);
+};
