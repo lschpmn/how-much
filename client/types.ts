@@ -7,6 +7,11 @@ export type DosageState = {
   typeObj: TypesObj,
 };
 
+export type DosageList = {
+  dosages: Dosage[],
+  isLoading: boolean,
+};
+
 export type State = {
   dosages: DosageState,
 };

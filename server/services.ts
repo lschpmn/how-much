@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io';
-import { addDosageSendServer, deleteDosageSendServer, setDosages } from '../client/lib/reducer';
+import { addDosageSendServer, deleteDosageSendServer, setDosages } from '../client/reducers/dosages';
 import { Dosage, SocketFunctions } from '../types';
 import db from './lib/db';
 import { log } from './lib/utils';

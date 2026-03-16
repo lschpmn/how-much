@@ -15,6 +15,11 @@ export type Dosage = {
   id: string,
   timestamp: number,
   typeId: string,
+  dosageTimes?: DosageTime,
+};
+
+export type DosageTime = {
+  [timestamp: string]: number,
 };
 
 export type EmitAction = (action: Action<any>, reason?: string) => void

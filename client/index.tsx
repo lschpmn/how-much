@@ -7,7 +7,7 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import App from './App';
 import { loggingMiddleware, socketMiddleware } from './lib/middleware';
-import { dosagesReducer } from './lib/reducer';
+import { dosagesReducer } from './reducers/dosages';
 import customParseFormat  from 'dayjs/plugin/customParseFormat';
 
 dayjs.extend(customParseFormat);

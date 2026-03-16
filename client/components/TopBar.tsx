@@ -3,7 +3,7 @@ import { isEqual } from 'lodash';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { TypesObj } from '../../types';
-import { setCurrentDosageId } from '../lib/reducer';
+import { setCurrentDosageId } from '../reducers/dosages';
 import { useAction } from '../lib/utils';
 import { CombinedDosagesObj, State } from '../types';
 

@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Action, Dosage, TypesObj } from '../../types';
 import { CombinedDosagesObj, DosageState } from '../types';
-import { calculateReducedValue, getNowMinute, getStepTime } from './utils';
+import { calculateReducedValue, getNowMinute, getStepTime } from '../lib/utils';
 
 const dosagesSlice = createSlice({
   name: 'dosages',

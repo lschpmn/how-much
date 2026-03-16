@@ -5,7 +5,7 @@ import { isEqual } from 'lodash';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Dosage, Type } from '../../../types';
-import { deleteDosageSendServer } from '../../lib/reducer';
+import { deleteDosageSendServer } from '../../reducers/dosages';
 import { constructRemainingStr, useAction } from '../../lib/utils';
 import { CombinedDosagesObj, State } from '../../types';
 

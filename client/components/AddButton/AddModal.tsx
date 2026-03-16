@@ -2,7 +2,7 @@ import { Button, Modal, Paper } from '@mui/material';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Dosage } from '../../../types';
-import { addDosageSendServer } from '../../lib/reducer';
+import { addDosageSendServer } from '../../reducers/dosages';
 import { getRndStr, useAction } from '../../lib/utils';
 import { State } from '../../types';
 import SetAmount from './SetAmount';

@@ -5,7 +5,7 @@ import { Server, Socket } from 'socket.io';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
-import { initSet } from '../client/lib/reducer';
+import { initSet } from '../client/reducers/dosages';
 import { Action, EmitAction } from '../types';
 import webpackConfig from '../webpack.config';
 import services from './services';
